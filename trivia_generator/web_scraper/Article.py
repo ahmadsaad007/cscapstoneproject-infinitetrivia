@@ -8,6 +8,7 @@ class Article:
     @param url : the url of the Wikipedia article
     @param categories : a list of strings representing the titles of the categories the article belongs to.
     @param access_timestamp : the Unix timestamp at which the article was accessed by the WebScraper.
+    
     @param longitude : the longitude of the physical location of the article, if relevant.
     @param latitude : the latitude of the physical location of the article, if relevant.
     """
@@ -15,5 +16,6 @@ class Article:
     url: str
     categories: list
     access_timestamp: int
+
     longitude: float = None
     latitude: float = None
