@@ -1,2 +1,2 @@
-from Article import Article
-from WebScraper import *
+from .Article import Article
+from .WebScraper import *

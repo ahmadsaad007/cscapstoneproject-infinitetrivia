@@ -1,5 +1,5 @@
-from web_scraper import Article
-from TUnit import TUnit
+from .web_scraper import Article
+from trivia_generator import TUnit
 
 def create_TUnits(article: Article) -> list:
     """Creates a list of TUnits from a Wikipedia article object.
