@@ -1,4 +1,4 @@
-from Article import Article
+from .Article import Article
 
 def get_page_by_category(category: str) -> Article:
     """Gets the contents and metadata of a Wikipedia article with a given category.
