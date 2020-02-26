@@ -36,7 +36,7 @@ class Game:
         :rtype: bool
         """
         pass
-    
+
     def start_game() -> bool:
         """Finalizes the lobby and begins a game session.
         :returns: True if the game session was successfully started, false otherwise
