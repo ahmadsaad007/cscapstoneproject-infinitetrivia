@@ -8,12 +8,19 @@ class Game:
     """Class for a running instance of a game session. Contains All Game
     Logic.
 
+    :param players: A list of the currently active players in the game.
+    :param game_settings: A *GameSettings* object which contains the settings of the game.
+    :param round_number: the current round number the game is on.
+    :param game_code: the game code used to connect to the game.
+    :param current_state: the current state of the game.
+    :param game_states: a list of all possible game states.
+    :param game_room: the ID of the game room used by connecting sockets.
+    :param trivia_database: the database containing trivia questions.
     """
     players: list
-    game_mode: str
     game_settings: GameSettings
     round_number: int
-    room_code: str
+    game_code: str
     current_state: str
     game_states: list
     game_room: int

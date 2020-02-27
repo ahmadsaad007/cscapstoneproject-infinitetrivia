@@ -3,10 +3,14 @@ from dataclasses import dataclass
 
 @dataclass
 class Hub:
-    """backend hub which serves static html pages and connects users to games."""
+    """backend hub which serves static html pages and connects users to games.
 
-    games: dict
-    num_games: int
+    :param games: a dictionary of games, with each corresponding game's game-code as the key.
+    :param num_games: the current number of active games.
+    """
+
+    games: dict = {}
+    num_games: int = 0
     # player_database
 
     def create_game() -> str:
