@@ -11,7 +11,7 @@ import time
 import requests
 import bs4
 
-from Article import Article
+from .Article import Article
 
 ARTICLE_BY_ID_URL = 'http://enwp.org?curid='
 RANDOM_URL = 'https://en.wikipedia.org/wiki/Special:Random'
@@ -22,6 +22,7 @@ def get_page_by_category(category: str) -> Article:
     """Gets the contents and metadata of a Wikipedia article with a given category.
 
     :param category: the category with which to search.
+    :type category: str
     :returns: the Article object representing the Wikipedia article.
 
     """
@@ -46,8 +47,11 @@ def get_page_by_location(latitude: float, longitude: float, radius: int) -> Arti
     """Gets the contents and metadata of a Wikipedia article close to the given coordinates.
     
     :param longitude: the longitude of the location, in decimal coordinates.
+    :type longitude: float
     :param latitude: the latitude of the location, in decimal coordinates.
+    :type latitude: float
     :param radius: the radius used to search, in meters.
+    :type radius: int
     :returns: the Article object representing the Wikipedia article.
     """
 
@@ -68,8 +72,11 @@ def _get_nearby_articles(latitude: float, longitude: float, radius: int) -> list
     """Gets a list of Wikipedia articles that are located close to the given coordinates:
     
     :param longitude: the longitude of the location, in decimal coordinates.
+    :type longitude: float
     :param latitude: the latitude of the location, in decimal coordinates.
+    :type latitude: float
     :param radius: the radius used to search, in meters.
+    :type radius: int
     :returns: a list of Wikipedia page ids.
     """
     req = None
@@ -95,6 +102,7 @@ def _get_page_and_url(url: str) -> (str, str):
     """Gets the HTML of a web page from a URL.
 
     :param url: the URL of the page from which to get the HTML.
+    :type url: str
     :returns: the HTML and URL of the retrieved web page, or (None, None) if request fails.
     """
     req = None
@@ -117,8 +125,11 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int) -> Ar
     """Parses the features of Article from the page html.
 
     :param page_html: the HTML of the page.
+    :type page_html: str
     :param url: the URL of the page.
+    :type url: str
     :param access_timestamp: the Unix timestamp at which the page was accessed.
+    :type access_timestamp: int
     :returns: the Article object representing the Wikipedia page.
     """
     soup = bs4.BeautifulSoup(page_html, features="html.parser")
@@ -149,6 +160,7 @@ def convert_dms_to_decimal(dms_coord: str) -> float:
     """Converts a degrees minutes seconds (DMS) coordinate to a decimal coordinate.
     
     :param dms_coord: a string representing a DMS coordinate.
+    :type dms_coord: str
     :returns: a decimal coordinate.
     """
     try:

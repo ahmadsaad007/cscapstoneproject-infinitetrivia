@@ -11,11 +11,17 @@ class Article:
     """Representation of a Wikipedia article and its metadata.
 
     :param content: the text of the Wikipedia article, cleaned of HTML tags.
+    :type content: str
     :param url: the url of the Wikipedia article
+    :type url: str
     :param categories: a list of strings representing the titles of the categories the article belongs to.
+    :type categories: List[str]
     :param access_timestamp: the Unix timestamp at which the article was accessed by the WebScraper.
+    :type access_timestamp: int
     :param latitude: the latitude of the physical location of the article, if relevant (default: None).
+    :type latitude: float
     :param longitude: the longitude of the physical location of the article, if relevant (default: None).
+    :type longitude: float
     """
     content: str
     url: str

@@ -1,23 +1,26 @@
+"""
+Database Connection
+===================
+"""
 from dataclasses import dataclass
-from web_app.app import Player
-from trivia_generator import TUnit
-from typing import List
 import sqlite3
 
+from game_models import Player
+from trivia_generator import TUnit
+from typing import List, Tuple
 
 @dataclass
 class DBConn:
+    """Class representing a database connection.
 
-    """Database utilities
-
-        :param DBFile: the name of the SQLite database file. Will be fetched at runtime from database config file.
+    :param DBFile: the name of the SQLite database file. Will be fetched at runtime from database config file.
 
     """
 
     DBFile: str = None
 
     def update_user(self, user: Player):
-        """Adds or updates a user in the database
+        """Adds or updates a user in the database.
 
         :param user: the Player object to be added to the database
         :type user: Player
@@ -26,7 +29,7 @@ class DBConn:
         pass
 
     def get_user(self, username: str) -> Player:
-        """Gets a user from the database by username
+        """Gets a user from the database by username.
 
         :param username: username to be retrieved
         :type username: str
@@ -37,7 +40,7 @@ class DBConn:
         pass
 
     def delete_user(self, user: Player):
-        """Deletes a user from the database
+        """Deletes a user from the database.
 
         :param user: a Player object to be deleted from database
         :type user: Player
@@ -46,16 +49,16 @@ class DBConn:
         pass
 
     def update_tunit(self, tunit: TUnit):
-        """Adds or updates a TUnit in the database
+        """Adds or updates a TUnit in the database.
 
-        :param tunit: a TUnit object to be deleted from databse
+        :param tunit: a TUnit object to be deleted from database
         :type tunit: TUnit
         :raises sqlite3.DatabaseError:
         """
         pass
 
     def get_tunit_random(self) -> TUnit:
-        """Gets a TUnit from the database by random
+        """Gets a TUnit from the database by random.
 
         :raises sqlite3.DatabaseError:
         :returns: an object representing a TUnit
@@ -64,7 +67,7 @@ class DBConn:
         pass
 
     def get_tunit_category(self, category: str) -> List[TUnit]:
-        """Gets a list of TUnits from the database by category
+        """Gets a list of TUnits from the database by category.
 
         :param category: the category used to to find TUnits
         :type category: str
@@ -75,7 +78,7 @@ class DBConn:
         pass
 
     def get_tunit_location(self, lat: float, long: float) -> List[TUnit]:
-        """Gets a list of TUnits from the database by location
+        """Gets a list of TUnits from the database by location.
 
         :param lat: a latitude coordinate
         :type lat: float
@@ -88,7 +91,7 @@ class DBConn:
         pass
 
     def delete_tunit(self, tunit: TUnit):
-        """Deletes a user from the database
+        """Deletes a user from the database.
 
         :param tunit: a TUnit object to be deleted from database
         :type tunit: TUnit
@@ -97,7 +100,7 @@ class DBConn:
         pass
 
     def add_question(self, question: str, tunit: TUnit):
-        """Adds a question entry in the database
+        """Adds a question entry in the database.
 
         :param question: the question text to be added
         :type question: str
@@ -107,8 +110,8 @@ class DBConn:
         """
         pass
 
-    def get_questions(self, tunit: TUnit) -> List[(str, str)]:
-        """Gets a list of questions associated with a TUnit
+    def get_questions(self, tunit: TUnit) -> List[tuple]:
+        """Gets a list of questions associated with a TUnit.
 
         :param tunit: the TUnit to retrieve questions from
         :type tunit: TUnit
@@ -119,7 +122,7 @@ class DBConn:
         pass
 
     def delete_question(self, question: str, tunit: TUnit):
-        """Deletes a question from the database
+        """Deletes a question from the database.
 
         :param question: the question text to be deleted
         :type question: str
@@ -130,7 +133,7 @@ class DBConn:
         pass
 
     def add_category(self, category: str):
-        """Adds a category to the database
+        """Adds a category to the database.
 
         :param category: the category to be added to the database
         :type category: str
@@ -139,7 +142,7 @@ class DBConn:
         pass
 
     def delete_category(self, category: str):
-        """Deletes a category from the database
+        """Deletes a category from the database.
 
         :param category: the category to be deleted from the database
         :type category: str
@@ -148,7 +151,7 @@ class DBConn:
         pass
 
     def add_vote(self, user: Player, question: str, interesting_rating: int, question_rating: int):
-        """Adds a quality vote associated with a user and a question
+        """Adds a quality vote associated with a user and a question.
 
         :param user: the user who generated the vote
         :type user: Player

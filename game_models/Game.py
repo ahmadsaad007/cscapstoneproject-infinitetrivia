@@ -4,14 +4,13 @@ Game
 """
 
 from dataclasses import dataclass
-from Player import Player
-from GameSettings import GameSettings
+from .Player import Player
+from .GameSettings import GameSettings
 
 
 @dataclass
 class Game:
-    """Class for a running instance of a game session. Contains All Game
-    Logic.
+    """Class for a running instance of a game session. Contains All Game Logic.
 
     :param players: A list of the currently active players in the game.
     :param game_settings: A *GameSettings* object which contains the settings of the game.
@@ -44,7 +43,7 @@ class Game:
     def remove_player_from_lobby(self, player: Player) -> bool:
         """Removes a player from the current game lobby.
 
-        :param player" the player to be removed from the game lobby
+        :param player: the player to be removed from the game lobby
         :type player: Player
         :returns: True if player was successfully removed from lobby, False otherwise
         :rtype: bool
