@@ -1,4 +1,9 @@
-from .web_scraper import Article
+"""
+NLP Pre-processor
+=================
+"""
+
+from web_scraper import Article
 from trivia_generator import TUnit
 
 def create_TUnits(article: Article) -> list:

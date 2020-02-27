@@ -1,3 +1,8 @@
+"""
+Game
+====
+"""
+
 from dataclasses import dataclass
 from Player import Player
 from GameSettings import GameSettings
@@ -26,8 +31,9 @@ class Game:
     game_room: int
     #  trivia_database: database
 
-    def add_player_to_lobby(player: Player) -> bool:
+    def add_player_to_lobby(self, player: Player) -> bool:
         """Adds a player to the current game lobby.
+
         :param player: the player to be added to the game lobby
         :type player: Player
         :returns: True if player was successfully added to lobby, False otherwise
@@ -35,8 +41,9 @@ class Game:
         """
         pass
 
-    def remove_player_from_lobby(player: Player) -> bool:
+    def remove_player_from_lobby(self, player: Player) -> bool:
         """Removes a player from the current game lobby.
+
         :param player" the player to be removed from the game lobby
         :type player: Player
         :returns: True if player was successfully removed from lobby, False otherwise
@@ -44,81 +51,91 @@ class Game:
         """
         pass
 
-    def start_game() -> bool:
+    def start_game(self) -> bool:
         """Finalizes the lobby and begins a game session.
+
         :returns: True if the game session was successfully started, false otherwise
         :rtype: bool
         """
         pass
 
-    def display_score() -> bool:
+    def display_score(self) -> bool:
         """Sends instructions to front end to display score information to the host screen and player(s).
+
         :returns: True if score information was successfully sent to front end, false otherwise
         :rtype: bool
         """
         pass
 
-    def present_trivia() -> bool:
-        """Sends the next trivia question to the front end, so it can be displayed on host scren.
+    def present_trivia(self) -> bool:
+        """Sends the next trivia question to the front end, so it can be displayed on host screen.
+
         :returns: True if trivia question was properly fetched and sent to front end, False otherwise
         :rtype: bool
         """
         pass
 
-    def get_next_trivia() -> bool:
+    def get_next_trivia(self) -> bool:
         """Fetches a trivia question for the upcoming round from the trivia database, based on the current GameSettings.
+
         :returns: True if trivia question was properly fetched from database, False otherwise
         :rtype: bool
         """
         pass
 
-    def display_category_options() -> bool:
+    def display_category_options(self) -> bool:
         """If applicable (depending on game mode), send a list of possible categories that a player can choose from to the front end, which will be displayed to the selected user.
+
         :returns: True if categories were properly fetched from database and sent to frontend, False otherwise
         :rtype: bool
         """
         pass
 
-    def fetch_response() -> bool:
+    def fetch_response(self) -> bool:
         """Fetches the answers to a trivia question from each player from the front end.
+
         :returns: True if all answers were fetched from front-end.
         :rtype: bool
         """
         pass
 
-    def display_winner() -> bool:
+    def display_winner(self) -> bool:
         """Send information about the winner of a game session to the front end.
+
         :returns: True if info about winner was successfully sent to frontend, false otherwise.
         :rtype: bool
         """
         pass
 
-    def display_winners_of_round() -> bool:
+    def display_winners_of_round(self) -> bool:
         """Send information about the winner(s) of the round to the front end. 
+
         :returns: True if info about winner(s) of the round was successfully sent to frontend, False otherwise.
         :rtype: bool
         """
         pass
 
-    def determine_winners_of_round():
+    def determine_winners_of_round(self):
         """Based of off the current trivia and the received answers from each player, determine who won the round.
         """
         pass
 
-    def update_state():
+    def update_state(self):
         """Updates the current state of the game. 
         """
         pass
 
-    def prompt_for_lie() -> bool:
+    def prompt_for_lie(self) -> bool:
         """If applicable (depending on game mode), tell front-end to prompt all player(s) for a fake-answer to a trivia question.
+
         :returns: True if info was successfully sent to front-end, False otherwise
         :rtype: bool
         """
         pass
 
-    def finish_game() -> bool:
+    def finish_game(self) -> bool:
         """After all rounds have been completed, sents "credits" information to front-end and updates statistics for all registered users.
+        
         :returns: True if info was successfully sent to front-end and user statistics were updated, false otherwise
         :rtype: bool
         """

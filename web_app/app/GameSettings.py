@@ -1,3 +1,8 @@
+"""
+Game Settings
+=============
+"""
+
 from dataclasses import dataclass
 
 

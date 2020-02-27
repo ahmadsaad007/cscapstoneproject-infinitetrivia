@@ -1,3 +1,8 @@
+"""
+Machine Learning Trivia Generator
+=================================
+"""
+
 from trivia_generator import TUnit
 
 
