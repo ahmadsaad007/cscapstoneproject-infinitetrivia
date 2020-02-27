@@ -137,3 +137,6 @@ dmypy.json
 
 # Database
 itdb.db
+
+# PyCharm
+.idea/
