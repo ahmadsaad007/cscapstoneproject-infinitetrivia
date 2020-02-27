@@ -22,7 +22,6 @@ class Hub:
         """Creates a new game session and corresponding Game instance.
 
         :returns: a game code corresponding to the newly created Game instance, or the empty string if the game does not exist.
-        :rval: str
         """
         pass
 
@@ -30,7 +29,6 @@ class Hub:
         """Removes the game corresponding to *game_code* from the dictionary of active games.
 
         :returns: True if the game was successfully removed, False otherwise
-        :rval: bool
         """
         pass
 
@@ -38,7 +36,6 @@ class Hub:
         """Starts the game corresponding to *game_code*.
 
         :returns: True if game was successfully started, False otherwise
-        :rval: bool
         """
         pass
 
@@ -65,7 +62,6 @@ class Hub:
         """Generates a unique gamecode string.
 
         :returns: a unique gamecode string
-        :rtype: str
         """
         pass
 
@@ -73,7 +69,6 @@ class Hub:
         """Logs the user in, provided user *credentials*.
 
         :returns: True if the login was successful, False otherwise.
-        :rtype: bool
         """
         pass
 
@@ -81,6 +76,5 @@ class Hub:
         """Checks user *credentials* against the player database.
 
         :returns: True if the user provided credentials are valid, False otherwise.
-        :rtype: bool
         """
         pass

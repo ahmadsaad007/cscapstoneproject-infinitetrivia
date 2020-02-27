@@ -36,7 +36,6 @@ class Game:
         :param player: the player to be added to the game lobby
         :type player: Player
         :returns: True if player was successfully added to lobby, False otherwise
-        :rtype: bool
         """
         pass
 
@@ -46,7 +45,6 @@ class Game:
         :param player: the player to be removed from the game lobby
         :type player: Player
         :returns: True if player was successfully removed from lobby, False otherwise
-        :rtype: bool
         """
         pass
 
@@ -54,7 +52,6 @@ class Game:
         """Finalizes the lobby and begins a game session.
 
         :returns: True if the game session was successfully started, false otherwise
-        :rtype: bool
         """
         pass
 
@@ -62,7 +59,6 @@ class Game:
         """Sends instructions to front end to display score information to the host screen and player(s).
 
         :returns: True if score information was successfully sent to front end, false otherwise
-        :rtype: bool
         """
         pass
 
@@ -70,7 +66,6 @@ class Game:
         """Sends the next trivia question to the front end, so it can be displayed on host screen.
 
         :returns: True if trivia question was properly fetched and sent to front end, False otherwise
-        :rtype: bool
         """
         pass
 
@@ -78,7 +73,6 @@ class Game:
         """Fetches a trivia question for the upcoming round from the trivia database, based on the current GameSettings.
 
         :returns: True if trivia question was properly fetched from database, False otherwise
-        :rtype: bool
         """
         pass
 
@@ -86,7 +80,6 @@ class Game:
         """If applicable (depending on game mode), send a list of possible categories that a player can choose from to the front end, which will be displayed to the selected user.
 
         :returns: True if categories were properly fetched from database and sent to frontend, False otherwise
-        :rtype: bool
         """
         pass
 
@@ -94,7 +87,6 @@ class Game:
         """Fetches the answers to a trivia question from each player from the front end.
 
         :returns: True if all answers were fetched from front-end.
-        :rtype: bool
         """
         pass
 
@@ -102,7 +94,6 @@ class Game:
         """Send information about the winner of a game session to the front end.
 
         :returns: True if info about winner was successfully sent to frontend, false otherwise.
-        :rtype: bool
         """
         pass
 
@@ -110,7 +101,6 @@ class Game:
         """Send information about the winner(s) of the round to the front end. 
 
         :returns: True if info about winner(s) of the round was successfully sent to frontend, False otherwise.
-        :rtype: bool
         """
         pass
 
@@ -128,7 +118,6 @@ class Game:
         """If applicable (depending on game mode), tell front-end to prompt all player(s) for a fake-answer to a trivia question.
 
         :returns: True if info was successfully sent to front-end, False otherwise
-        :rtype: bool
         """
         pass
 
@@ -136,6 +125,5 @@ class Game:
         """After all rounds have been completed, sents "credits" information to front-end and updates statistics for all registered users.
         
         :returns: True if info was successfully sent to front-end and user statistics were updated, false otherwise
-        :rtype: bool
         """
         pass

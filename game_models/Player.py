@@ -28,7 +28,6 @@ class Player:
     def get_name(self) -> str:
         """Returns the name of the player. The name of the user is the currently registered name in the game session.
         :returns: the name of the user
-        :rtype: str
         """
         pass
 
@@ -36,7 +35,6 @@ class Player:
         """Returns the integer ID of the current room the player is in.
 
         :returns: the integer ID of the player's current room, or -1 if the player is no longer in a game room.
-        :rtype: int
         """
         pass
 
@@ -44,7 +42,6 @@ class Player:
         """returns True if the player is currently connected to a game session.
 
         :returns: True if the player is currently connected, False otherwise
-        :rtype: bool
         """
         pass
 
@@ -53,7 +50,6 @@ class Player:
 
         :param increment: the value the player's score should be incremented by
         :returns: True if the player's score was successfully updated, false otherwise.
-        :rtype: bool
         """
         pass
 
@@ -61,7 +57,6 @@ class Player:
         """Returns the current score of the player.
 
         :returns: the current score of the player.
-        :rtype: int
         """
         pass
 
@@ -71,7 +66,6 @@ class Player:
         :param game_settings: the game settings of the current game.
         :param player_db_handle: a handle to the database storing registered Player statistics.
         :returns: True if the player database entry was sucessfully updated, False otherwise
-        :rtype: bool
         """
         pass
 
@@ -79,7 +73,6 @@ class Player:
         """Returns a boolean indicating if the player is a registered user or not.
 
         :returns: True if the player is registered, False if not.
-        :rtype: bool
         """
         pass
 
@@ -87,6 +80,5 @@ class Player:
         """Returns the unique ID of the user.
 
         :returns: the ID of the user, or -1 if the user does not have a valid ID.
-        :rtype: bool
         """
         pass
