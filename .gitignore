@@ -140,3 +140,7 @@ itdb.db
 
 # PyCharm
 .idea/
+
+# Emacs
+*~
+*#
