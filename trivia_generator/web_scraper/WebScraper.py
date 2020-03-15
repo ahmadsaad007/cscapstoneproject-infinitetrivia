@@ -11,11 +11,67 @@ import time
 import requests
 import bs4
 
-from .Article import Article
+from Article import Article
 
-ARTICLE_BY_ID_URL = 'http://enwp.org?curid='
+BASE_URL = 'https://en.wikipedia.org/wiki/'
 RANDOM_URL = 'https://en.wikipedia.org/wiki/Special:Random'
 LOCATION_URL_FORMAT = 'https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=%d&gscoord=%lf|%lf&format=json'
+
+
+# TODO move DB functions to DBConn.
+def select_random_article() -> tuple:
+    """Selects a random article from the database.
+
+    returns: the article id and title of the random article.
+    """
+    import sqlite3
+    db = sqlite3.connect('itdb.db')
+    cursor = db.cursor()
+    cursor.execute('SELECT article_id, title FROM article ORDER BY random() LIMIT 1;')
+    article_id, title = cursor.fetchone()
+    return article_id, title
+
+def select_article_categories(article_id: int) -> list:
+    """Selects the categories associated with the article with the given article id.
+
+    :param article_id: The ID of the article.
+    :type article_id: int
+    :returns: the list of strings representing the names of the categories.
+    """
+    import sqlite3
+    db = sqlite3.connect('itdb.db')
+    cursor = db.cursor()
+    query = """
+    SELECT name
+    FROM article_category
+        JOIN category ON article_category.category_id = category.category_id
+    WHERE article_id = ?;
+    """
+    cursor.execute(query, (article_id,))
+    rows = cursor.fetchall()
+    return rows
+
+
+def select_category_articles(category: str) -> list:
+    """Selects the categories associated with the article with the given article id.
+
+    :param category: category name.
+    :type category: int
+    :returns: the list of article_ids associated with that category.
+    """
+    import sqlite3
+    db = sqlite3.connect('itdb.db')
+    cursor = db.cursor()
+    query = """
+    SELECT article.article_id, article.title
+    FROM article_category
+        JOIN category ON article_category.category_id = category.category_id
+        JOIN article ON article_category.article_id = article.article_id
+    WHERE name = ?;
+    """
+    cursor.execute(query, (category,))
+    rows = cursor.fetchall()
+    return rows
 
 
 def get_page_by_category(category: str) -> Article:
@@ -26,23 +82,33 @@ def get_page_by_category(category: str) -> Article:
     :returns: the Article object representing the Wikipedia article.
 
     """
-    pass
+    articles_with_category = select_category_articles(category)
+    article_id, title = random.choice(articles_with_category)
+    url = BASE_URL + title.replace(' ', '_')
+    page_html = _get_page_from_title(title)
+    access_timestamp = int(time.time())
+
+    article = _get_article_features(page_html, url, access_timestamp, article_id)
+    return article
 
 def get_page_by_random() -> Article:
     """Gets the contents and metadata of a random Wikipedia article.
     
     :returns: the Article object representing the Wikipedia article.
     """
-
+    article_id, title = None, None
     page_html = None
     url = None
     while page_html is None:
-        page_html, url = _get_page_and_url(RANDOM_URL)
+        article_id, title = select_random_article()
+        url = BASE_URL + title.replace(' ', '_')
+        page_html = _get_page_from_title(title)
     access_timestamp = int(time.time())
 
-    article = _get_article_features(page_html, url, access_timestamp)
+    article = _get_article_features(page_html, url, access_timestamp, article_id)
     return article
 
+# TODO change to make sure articles are in database.
 def get_page_by_location(latitude: float, longitude: float, radius: int) -> Article:
     """Gets the contents and metadata of a Wikipedia article close to the given coordinates.
     
@@ -55,18 +121,17 @@ def get_page_by_location(latitude: float, longitude: float, radius: int) -> Arti
     :returns: the Article object representing the Wikipedia article.
     """
 
-    nearby_article_ids = _get_nearby_articles(latitude, longitude, radius)
+    nearby_articles = _get_nearby_articles(latitude, longitude, radius)
 
     page_html = None
     url = None
     while page_html is None:
-        nearby_article_id = random.choice(nearby_article_ids)
-        page_html, url = _get_page_and_url(ARTICLE_BY_ID_URL + str(nearby_article_id))
+        nearby_article = random.choice(nearby_articles)
+        page_html, url = _get_page_and_url(BASE_URL + str(nearby_article))
     access_timestamp = int(time.time())
 
     article = _get_article_features(page_html, url, access_timestamp)
     return article
-    pass
 
 def _get_nearby_articles(latitude: float, longitude: float, radius: int) -> list:
     """Gets a list of Wikipedia articles that are located close to the given coordinates:
@@ -77,7 +142,7 @@ def _get_nearby_articles(latitude: float, longitude: float, radius: int) -> list
     :type latitude: float
     :param radius: the radius used to search, in meters.
     :type radius: int
-    :returns: a list of Wikipedia page ids.
+    :returns: a list of Wikipedia page titles.
     """
     req = None
     res = None
@@ -94,9 +159,33 @@ def _get_nearby_articles(latitude: float, longitude: float, radius: int) -> list
         return None
 
     #TODO add error handling for JSON.
-    article_ids = [page['pageid'] for page in res['query']['geosearch']]
-    
-    return article_ids
+    article_titles = [page['title'].replace(' ', '_') for page in res['query']['geosearch']]
+
+    return article_titles
+
+def _get_page_from_title(title: str) -> str:
+    """Gets the HTML of a web page from an article title.
+
+    :param title: the title of the article from which to get the HTML.
+    :type title: str
+    :returns: the HTML and URL of the retrieved web page, or (None, None) if request fails.
+    """
+    url = BASE_URL + title.replace(' ', '_')
+    req = None
+    try:
+        req = requests.get(url)
+
+    except ConnectionError:
+        return None
+    except requests.HTTPError:
+        return None
+    except requests.Timeout:
+        return None
+
+    page_html = req.text
+    if page_html is None or page_html == '':
+        return None
+    return page_html
 
 def _get_page_and_url(url: str) -> (str, str):
     """Gets the HTML of a web page from a URL.
@@ -121,7 +210,7 @@ def _get_page_and_url(url: str) -> (str, str):
         return None, None
     return page_html, req.url
 
-def _get_article_features(page_html: str, url: str, access_timestamp: int) -> Article:
+def _get_article_features(page_html: str, url: str, access_timestamp: int, article_id: int = 1) -> Article:
     """Parses the features of Article from the page html.
 
     :param page_html: the HTML of the page.
@@ -130,6 +219,8 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int) -> Ar
     :type url: str
     :param access_timestamp: the Unix timestamp at which the page was accessed.
     :type access_timestamp: int
+    :param article_id: the ID of the article in the database.
+    :type article_id: int.
     :returns: the Article object representing the Wikipedia page.
     """
     soup = bs4.BeautifulSoup(page_html, features="html.parser")
@@ -137,6 +228,7 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int) -> Ar
     for tag in soup.findAll('p'):
         content += ''.join(tag.strings) + '\n'
 
+    # TODO check if categories are in base category list.
     categories = []
     categories_div = soup.find('div', {'id': 'mw-normal-catlinks'})
     for li in categories_div.ul.children:
@@ -151,8 +243,8 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int) -> Ar
     else:
         longitude = None
         latitude = None
-
-    article = Article(content, url, categories, access_timestamp, latitude, longitude)
+    # print(content, url, categories, 1, access_timestamp, latitude, longitude)
+    article = Article(content, url, article_id, categories, access_timestamp, latitude, longitude)
     return article
 
 
@@ -188,5 +280,7 @@ def convert_dms_to_decimal(dms_coord: str) -> float:
 
 if __name__ == '__main__':
     for _ in range(10):
-        article = get_page_by_location(39.98, -75.16, 10000, )
+        # article = get_page_by_location(39.98, -75.16, 10000, )
+        # article = get_page_by_random()
+        article = get_page_by_category("People by status")
         print(article, '\n')
