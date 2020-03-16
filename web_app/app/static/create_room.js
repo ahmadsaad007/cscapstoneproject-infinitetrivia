@@ -72,13 +72,13 @@ function add_player_to_lobby(name){
 
 function remove_player_from_lobby(name){
     console.log("removing player from lobby!");
-    console.log("name: ", name);
+    console.log("name:", name);
     var ele = $("#player_list");
     for (i = 0; i < ele.length; i++){
 	console.log(ele[i].innerText);
 	if (ele[i].innerText === name){
 	    console.log("found it!");
-	    //ele[i].remove();
+	    ele[i].remove();
 	}
     }
 
