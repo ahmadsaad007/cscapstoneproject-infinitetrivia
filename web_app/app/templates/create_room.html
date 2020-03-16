@@ -9,19 +9,22 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
     <div id="room_container"/>
-    <h2>Create A Room Here</h2>
-    <div id="radio_buttons">
-      <!-- Options -->
-      <input type="radio" id="fibbage" name="game_mode" value="fibbage">
-      <label for="fibbage">Fibbage</label><br>
-      <input type="radio" id="category" name="game_mode" value="category">
-      <label for="category">Category</label><br>
-      <input type="radio" id="random" name="game_mode" value="random">
-      <label for="random">Random</label> 
+    <div id="create_room_options">
+      <h2>Create A Room Here</h2>
+      <div id="radio_buttons">
+	<!-- Options -->
+	<input type="radio" id="fibbage" name="game_mode" value="fibbage">
+	<label for="fibbage">Fibbage</label><br>
+	<input type="radio" id="category" name="game_mode" value="category">
+	<label for="category">Category</label><br>
+	<input type="radio" id="random" name="game_mode" value="random">
+	<label for="random">Random</label> 
+      </div>
+      <br>
+      <button type="button" id="create_room_button">Create Room!</button>
     </div>
-    <p></p>
     <!-- buttons -->
-    <button type="button" id="create_room_button">Create Room!</button>
+
     <script type="text/javascript" src="{{ url_for('static', filename='create_room.js') }}"></script>
   </body>
 </html>

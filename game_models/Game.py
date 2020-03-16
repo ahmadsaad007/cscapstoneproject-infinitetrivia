@@ -3,12 +3,10 @@ Game
 ====
 """
 
-from dataclasses import dataclass
-from .Player import Player
-from .GameSettings import GameSettings
+from Player import Player
+from GameSettings import GameSettings
 
 
-@dataclass
 class Game:
     """Class for a running instance of a game session. Contains All Game Logic.
 
@@ -21,14 +19,17 @@ class Game:
     :param game_room: the ID of the game room used by connecting sockets.
     :param trivia_database: the database containing trivia questions.
     """
-    players: list
-    game_settings: GameSettings
-    round_number: int
-    game_code: str
-    current_state: str
-    game_states: list
-    game_room: int
-    #  trivia_database: database
+    # game_states: list
+
+    def __init__(self, game_code: str,
+                 game_settings: GameSettings,
+                 host_id: str):
+        self.players = []
+        self.game_code = game_code
+        self.game_settings = game_settings
+        self.host_id = host_id
+        self.round_number = 0
+        self.current_state = "LOBBY"
 
     def add_player_to_lobby(self, player: Player) -> bool:
         """Adds a player to the current game lobby.
