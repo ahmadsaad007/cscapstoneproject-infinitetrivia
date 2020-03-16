@@ -38,7 +38,8 @@ class Game:
         :type player: Player
         :returns: True if player was successfully added to lobby, False otherwise
         """
-        pass
+        self.players.append(player)
+        return True
 
     def remove_player_from_lobby(self, player: Player) -> bool:
         """Removes a player from the current game lobby.
@@ -47,7 +48,8 @@ class Game:
         :type player: Player
         :returns: True if player was successfully removed from lobby, False otherwise
         """
-        pass
+        self.players.remove(player)
+        return True
 
     def start_game(self) -> bool:
         """Finalizes the lobby and begins a game session.

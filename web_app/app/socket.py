@@ -1,6 +1,8 @@
 from app import socketio, games
 from app.game_models.Game import Game
 from app.game_models.Player import Player
+from app.validations import is_game_code_valid
+from app.validations import is_game_name_valid
 from flask import request
 
 
@@ -16,10 +18,37 @@ def create_game(game_options):
 
 @socketio.on('join_game')
 def join_game(data):
-    player = Player(name=data['name'],
+    code = data['code']
+    name = data['name']
+    print(name, " attempting to join game")
+    if not is_game_code_valid(code):
+        print("error: ", code, " is bad code")
+        return "ERR_INVALID_CODE"
+    if not is_game_name_valid(code, name):
+        print("error: ", name, " is an invalid name")
+        return "ERR_INVALID_NAME"
+    player = Player(name=name,
                     ID=request.sid,
                     connected=True,
                     current_score=0,
                     is_registered=False)  # TODO
-    code = data['code']
-    games[code].add_player_to_lobby(player)
+    game = games[code]
+    if not game.add_player_to_lobby(player):
+        print("error: could not join")
+        return "ERR_COULD_NOT_JOIN"
+    else:
+        socketio.emit("add_player_to_lobby", name, room=game.host_id)
+        print("added player to lobby!")
+        return "ADDED_TO_LOBBY"
+
+
+@socketio.on('disconnect')
+def on_disconnect():
+    print("disconnected!")
+    sid = request.sid
+    for game in games.values():
+        ls = [player for player in game.players if player.ID == sid]
+        if len(ls) != 0:
+            print(ls[0].name, "leaving game ", game.host_id)
+            socketio.emit("remove_player_from_lobby", ls[0].name, room=game.host_id)
+            break
