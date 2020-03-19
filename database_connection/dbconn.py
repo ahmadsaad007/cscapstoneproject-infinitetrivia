@@ -416,6 +416,8 @@ class DBConn:
         """
         cursor.execute(query, (lat, lat, long, long))
         db_tunit = cursor.fetchone()
+        if db_tunit is None:
+            return None
 
         query = """
         SELECT name
@@ -612,8 +614,7 @@ class DBConn:
         SELECT article_id, title
         FROM article
         JOIN t_unit tu on article.article_id = tu.article_id
-        WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5
-        AND 
+        WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5 AND
         tu.long > ? - 0.5 AND tu.long < ? + 0.5
         """
         cursor.execute(query, (lat, lat, long, long))
