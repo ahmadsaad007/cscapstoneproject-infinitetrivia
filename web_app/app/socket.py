@@ -75,4 +75,4 @@ def start_game(code):
 @socketio.on('request_trivia')
 def request_trivia(code):
     # TODO differentiate between game modes
-    
+    pass
