@@ -32,41 +32,16 @@ class DBConn:
     DB_CONFIG_FILE: str = "database_connection/db.cfg"
     db_filename: str = None
 
+    def __init__(self):
+        with open(DBConn.DB_CONFIG_FILE, "r") as file:
+            self.db_filename = file.read().split("=")[1]
+
     @staticmethod
     def __dict_factory(cursor, row):
         d = {}
         for idx, col in enumerate(cursor.description):
             d[col[0]] = row[idx]
         return d
-
-    @staticmethod
-    def __coordinate_search_query(lat, long):
-        query = None
-        if lat >= 0 and long >= 0:
-            query = """
-            WHERE lat > ? - 0.5 AND lat < ? + 0.5
-                AND long > ? - 0.5 AND long < ? + 0.5
-            """
-        elif lat < 0 and long >= 0:
-            query = """
-            WHERE lat > ? - 0.5 AND lat < ? + 0.5
-                AND long > ? + 0.5 AND long < ? - 0.5
-            """
-        elif lat >= 0 and long < 0:
-            query = """
-            WHERE lat > ? + 0.5 AND lat < ? - 0.5
-                AND long > ? - 0.5 AND long < ? + 0.5
-            """
-        elif lat < 0 and long < 0:
-            query = """
-            WHERE lat > ? + 0.5 AND lat < ? - 0.5
-                AND long > ? + 0.5 AND long < ? - 0.5
-            """
-        return query
-
-    def __init__(self):
-        with open(DBConn.DB_CONFIG_FILE, "r") as file:
-            self.db_filename = file.read().split("=")[1]
 
     def select_random_article(self) -> tuple:
         """Selects a random article from the database.
@@ -435,9 +410,10 @@ class DBConn:
             subj_word, 
             readability
         FROM t_unit
+        WHERE lat > ? - 0.5 AND lat < ? + 0.5
+        AND 
+        long > ? - 0.5 AND long < ? + 0.5
         """
-        query += self.__coordinate_search_query(lat, long)
-        self.__coordinate_search_query(lat, long)
         cursor.execute(query, (lat, lat, long, long))
         db_tunit = cursor.fetchone()
 
@@ -634,9 +610,12 @@ class DBConn:
         cursor = db.cursor()
         query = """
         SELECT article_id, title
-        FROM article 
+        FROM article
+        JOIN t_unit tu on article.article_id = tu.article_id
+        WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5
+        AND 
+        tu.long > ? - 0.5 AND tu.long < ? + 0.5
         """
-        query += self.__coordinate_search_query(lat, long)
         cursor.execute(query, (lat, lat, long, long))
         articles = []
         for article in cursor.fetchall():
