@@ -2,6 +2,8 @@ console.log("Create Room JS successfully loaded.");
 
 var socket = io.connect('http://' + document.domain + ":" + location.port);
 
+const pause = time => new Promise(resolve => setTimeout(resolve, time));
+
 // connect create room button to function
 $( "#create_room_button" ).on("click", create_room);
 
@@ -81,12 +83,13 @@ function remove_player_from_lobby(name){
 	    ele[i].remove();
 	}
     }
-
 }
 
 function display_score(data){
     const title = "<h3>Score:</h3>";
     const score_board = "<ul id=score_board/>";
+    var counter_display = '<h3 id="counter_display">Round starts in ';
+    counter_display += '<b id="count_number">5</b> seconds</h3>';
     let players = data['players'];
     console.log(players);
     $('#room_container').empty();
@@ -97,6 +100,23 @@ function display_score(data){
 	console.log("score", player['score']);
 	$('#score_board').append('<li>' + player['name'] + " " +  player['score'] + '</li>');
     }
+    console.log(counter_display);
+    $('#room_container').append(counter_display);
+    countdown_to_next_round(5);
+}
+
+function present_trivia(){
+    console.log('trivia!');
+}
+
+async function countdown_to_next_round(seconds){
+    let counter = seconds;
+    while (counter > 0){
+	await pause(1000);
+	counter--;
+	$('#count_number').text(counter.toString());
+    }
+    // display trivia
 }
 
 function add_start_game_button(){

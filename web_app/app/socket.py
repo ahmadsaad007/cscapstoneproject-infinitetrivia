@@ -70,3 +70,9 @@ def start_game(code):
         data['players'].append(player_entry)
     print(data)
     return data
+
+
+@socketio.on('request_trivia')
+def request_trivia(code):
+    # TODO differentiate between game modes
+    
