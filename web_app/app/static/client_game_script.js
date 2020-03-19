@@ -2,6 +2,10 @@ var socket = io.connect('http://' + document.domain + ":" + location.port);
 // connect Join Game button
 $("#join_room_button").on("click", join_game);
 
+// connect socket to events
+socket.on('display_splash_screen', display_splash_screen);
+socket.on('display_text_response_prompt', display_text_response_prompt);
+
 console.log("reporting from client game script!");
 
 function join_game(){
@@ -62,4 +66,18 @@ function display_join_error(){
 function display_game_lobby(){
     $( '#home_screen_container').remove();
     $( '#game_container' ).append("<h3>Waiting for game to start...</h3>");
+}
+
+function display_splash_screen(){
+    $('#game_container').empty();
+    // TODO update round 
+    $('#game_container').append("<h3>Round 1<\h3>");
+}
+
+function display_text_response_prompt(){
+    const prompt = '<b>Answer:</b> <input id="text_answer">';
+    const submit = '<button type="button">Submit!</button>';
+    $('#game_container').empty();
+    $('#game_container').append(prompt);
+    $('#game_container').append(submit);
 }

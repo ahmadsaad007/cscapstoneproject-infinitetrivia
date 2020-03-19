@@ -58,6 +58,7 @@ def on_disconnect():
 
 @socketio.on('start_game')
 def start_game(code):
+    # TODO get round number and send it to players
     socketio.emit("display_splash_screen", room=code)
     players = games[code].players
     data = dict()
@@ -74,5 +75,11 @@ def start_game(code):
 
 @socketio.on('request_trivia')
 def request_trivia(code):
-    # TODO differentiate between game modes
-    pass
+    print("got a trivia request from game ", code)
+    return "Who was the realest in 1865?"
+
+
+@socketio.on('prompt_response')
+def prompt_response(code):
+    print("prompting for response")
+    socketio.emit('display_text_response_prompt', room=code)

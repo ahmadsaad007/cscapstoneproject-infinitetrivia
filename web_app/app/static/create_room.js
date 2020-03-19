@@ -3,6 +3,7 @@ console.log("Create Room JS successfully loaded.");
 var socket = io.connect('http://' + document.domain + ":" + location.port);
 
 const pause = time => new Promise(resolve => setTimeout(resolve, time));
+var CODE; 
 
 // connect create room button to function
 $( "#create_room_button" ).on("click", create_room);
@@ -20,6 +21,7 @@ socket.on('remove_player_from_lobby', (name) => {
 function create_room(){
     let game_options = get_game_options();
     let code = create_room_code();
+    CODE = code;
     game_options.code = code;
 
     $( '#create_room_options').remove();
@@ -102,14 +104,34 @@ function display_score(data){
     }
     console.log(counter_display);
     $('#room_container').append(counter_display);
-    countdown_to_next_round(5);
+    countdown(5).then(request_trivia);
 }
 
-function present_trivia(){
-    console.log('trivia!');
+function request_trivia(){
+    socket.emit('request_trivia', get_code(), function(trivia){
+	present_trivia(trivia);
+    });
 }
 
-async function countdown_to_next_round(seconds){
+function present_trivia(trivia){
+    console.log(trivia);
+    const time_board = '<h3><b id="count_number">30</b> seconds to answer</h3>';
+    $('#room_container').empty();
+    $('#room_container').append("<b>" + trivia + "</b>");
+    $('#room_container').append(time_board);
+    prompt_response();
+    countdown(30).then(display_answer);
+}
+
+function prompt_response(){
+    socket.emit("prompt_response", get_code());
+}
+
+function display_answer(){
+    console.log("answer!");
+}
+
+async function countdown(seconds){
     let counter = seconds;
     while (counter > 0){
 	await pause(1000);
@@ -126,7 +148,8 @@ function add_start_game_button(){
 }
 
 function get_code(){
-    return $('#room_id').text().replace("Room ID: ", "");
+    //return $('#room_id').text().replace("Room ID: ", "");
+    return CODE;
 }
 
 function start_game(){
