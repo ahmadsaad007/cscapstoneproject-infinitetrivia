@@ -11,7 +11,7 @@ import time
 import requests
 import bs4
 
-from Article import Article
+from .Article import Article
 
 BASE_URL = 'https://en.wikipedia.org/wiki/'
 RANDOM_URL = 'https://en.wikipedia.org/wiki/Special:Random'
@@ -19,59 +19,7 @@ LOCATION_URL_FORMAT = 'https://en.wikipedia.org/w/api.php?action=query&list=geos
 
 
 # TODO move DB functions to DBConn.
-def select_random_article() -> tuple:
-    """Selects a random article from the database.
 
-    returns: the article id and title of the random article.
-    """
-    import sqlite3
-    db = sqlite3.connect('itdb.db')
-    cursor = db.cursor()
-    cursor.execute('SELECT article_id, title FROM article ORDER BY random() LIMIT 1;')
-    article_id, title = cursor.fetchone()
-    return article_id, title
-
-def select_article_categories(article_id: int) -> list:
-    """Selects the categories associated with the article with the given article id.
-
-    :param article_id: The ID of the article.
-    :type article_id: int
-    :returns: the list of strings representing the names of the categories.
-    """
-    import sqlite3
-    db = sqlite3.connect('itdb.db')
-    cursor = db.cursor()
-    query = """
-    SELECT name
-    FROM article_category
-        JOIN category ON article_category.category_id = category.category_id
-    WHERE article_id = ?;
-    """
-    cursor.execute(query, (article_id,))
-    rows = cursor.fetchall()
-    return rows
-
-
-def select_category_articles(category: str) -> list:
-    """Selects the categories associated with the article with the given article id.
-
-    :param category: category name.
-    :type category: int
-    :returns: the list of article_ids associated with that category.
-    """
-    import sqlite3
-    db = sqlite3.connect('itdb.db')
-    cursor = db.cursor()
-    query = """
-    SELECT article.article_id, article.title
-    FROM article_category
-        JOIN category ON article_category.category_id = category.category_id
-        JOIN article ON article_category.article_id = article.article_id
-    WHERE name = ?;
-    """
-    cursor.execute(query, (category,))
-    rows = cursor.fetchall()
-    return rows
 
 
 def get_page_by_category(category: str) -> Article:
@@ -82,7 +30,7 @@ def get_page_by_category(category: str) -> Article:
     :returns: the Article object representing the Wikipedia article.
 
     """
-    articles_with_category = select_category_articles(category)
+    articles_with_category = DBConn().select_category_articles(category)
     article_id, title = random.choice(articles_with_category)
     url = BASE_URL + title.replace(' ', '_')
     page_html = _get_page_from_title(title)
@@ -100,7 +48,7 @@ def get_page_by_random() -> Article:
     page_html = None
     url = None
     while page_html is None:
-        article_id, title = select_random_article()
+        article_id, title = DBConn().select_random_article()
         url = BASE_URL + title.replace(' ', '_')
         page_html = _get_page_from_title(title)
     access_timestamp = int(time.time())
