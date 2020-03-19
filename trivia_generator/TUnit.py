@@ -32,6 +32,8 @@ class TUnit:
     :param readability: the Gunning FOG index of sentence (see https://www.readabilityformulas.com/gunning-fog-readability-formula.php)
     :type readability: int
 
+    :param t_unit_id: the auto-assigned id of the TUnit in the database
+    :type t_unit_id: int
     :param longitude: the longitude of the physical location of the article, if relevant.
     :type longitude: float
     :param latitude: the latitude of the physical location of the article, if relevant.
@@ -54,6 +56,8 @@ class TUnit:
     root_word: str
     subj_word: str
     readability: int
+
+    t_unit_id: int = None
 
     latitude: float = None
     longitude: float = None

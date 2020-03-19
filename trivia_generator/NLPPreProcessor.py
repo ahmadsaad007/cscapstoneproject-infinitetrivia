@@ -7,9 +7,9 @@ import spacy
 from spacy.tokens import Span, Token
 from spacy.matcher import PhraseMatcher
 
-from web_scraper import Article
-from web_scraper import get_page_by_random
-from TUnit import TUnit
+from .web_scraper import Article
+from .web_scraper import get_page_by_random
+from .TUnit import TUnit
 
 
 def _init_contradictatory_matcher():
