@@ -12,6 +12,8 @@ class TUnit:
 
     :param sentence: the original sentence from Wikipedia.
     :type sentence: str
+    :param article_id: the ID of the Wikipedia article.
+    :type article_id: int
     :param url: the url of the Wikipedia article.
     :type url: str
     :param categories: a list of strings representing the titles of the categories the article belongs to.
@@ -30,6 +32,8 @@ class TUnit:
     :param readability: the Gunning FOG index of sentence (see https://www.readabilityformulas.com/gunning-fog-readability-formula.php)
     :type readability: int
 
+    :param t_unit_id: the auto-assigned id of the TUnit in the database
+    :type t_unit_id: int
     :param longitude: the longitude of the physical location of the article, if relevant.
     :type longitude: float
     :param latitude: the latitude of the physical location of the article, if relevant.
@@ -41,7 +45,9 @@ class TUnit:
     """
 
     sentence: str
+    article_id: int
     url: str
+
     categories: list
     access_timestamp: int
 
@@ -51,8 +57,28 @@ class TUnit:
     subj_word: str
     readability: int
 
+    t_unit_id: int = None
+
     latitude: float = None
     longitude: float = None
 
     trivia_rank: int = None
     question_rank: int = None
+
+    def __str__(self):
+        categories_str = '\n      - '.join(self.categories)
+        return f"""TUnit:
+  - Sentence: '{self.sentence[:137]}...'
+  - Article ID: {self.article_id}
+  - URL: {self.url}
+  - Categories:
+      - {categories_str}
+  - Access Timestamp: {self.access_timestamp}
+  - Coordinates:  ({self.latitude}, {self.longitude})
+  - Has Superlative: {self.has_superlative}
+  - Has Contrasting Phrases: {self.has_contrasting}
+  - Root Word: {self.root_word}
+  - Subject Word: {self.subj_word}
+  - Readability (FOG): {self.readability}
+  - Trivia Rank: {self.trivia_rank}
+  - Question Rank: {self.question_rank}"""
