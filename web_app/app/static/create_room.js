@@ -21,10 +21,10 @@ function create_room(){
     game_options.code = code;
 
     $( '#create_room_options').remove();
-    
     // ask server to create game session
     socket.emit('create_game', game_options, function(val) {
 	add_lobby_html(val);
+	add_start_game_button();
     });
 }
 
@@ -82,4 +82,36 @@ function remove_player_from_lobby(name){
 	}
     }
 
+}
+
+function display_score(data){
+    const title = "<h3>Score:</h3>";
+    const score_board = "<ul id=score_board/>";
+    let players = data['players'];
+    console.log(players);
+    $('#room_container').empty();
+    $('#room_container').append(title);
+    $('#room_container').append(score_board);
+    for (player of players){
+	console.log("name", player['name']);
+	console.log("score", player['score']);
+	$('#score_board').append('<li>' + player['name'] + " " +  player['score'] + '</li>');
+    }
+}
+
+function add_start_game_button(){
+    let btn = '<button type=button id="start_game_btn"> ' + "Start Game!" + "</button>";
+    $('#room_container').append(btn);
+    $('#start_game_btn').on('click', start_game);
+}
+
+function get_code(){
+    return $('#room_id').text().replace("Room ID: ", "");
+}
+
+function start_game(){
+    console.log("starting game!");
+    // TODO: error check (make sure there are players)
+    console.log(get_code());
+    socket.emit("start_game", get_code(), data => display_score(data));
 }

@@ -4,6 +4,7 @@ from app.game_models.Player import Player
 from app.validations import is_game_code_valid
 from app.validations import is_game_name_valid
 from flask import request
+from flask_socketio import join_room
 
 
 @socketio.on('create_game')
@@ -39,6 +40,7 @@ def join_game(data):
     else:
         socketio.emit("add_player_to_lobby", name, room=game.host_id)
         print("added player to lobby!")
+        join_room(code)
         return "ADDED_TO_LOBBY"
 
 
@@ -52,3 +54,19 @@ def on_disconnect():
             print(ls[0].name, "leaving game ", game.host_id)
             socketio.emit("remove_player_from_lobby", ls[0].name, room=game.host_id)
             break
+
+
+@socketio.on('start_game')
+def start_game(code):
+    socketio.emit("display_splash_screen", room=code)
+    players = games[code].players
+    data = dict()
+    data['players'] = []
+    players.sort(key=lambda p: p.current_score, reverse=True)
+    for player in players:
+        player_entry = dict()
+        player_entry['name'] = player.name
+        player_entry['score'] = player.current_score
+        data['players'].append(player_entry)
+    print(data)
+    return data
