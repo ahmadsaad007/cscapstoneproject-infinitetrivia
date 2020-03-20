@@ -5,7 +5,7 @@ Database Connection
 from dataclasses import dataclass
 import sqlite3
 
-from game_models import Player
+from game_models.Player import Player
 from trivia_generator import TUnit
 from typing import List
 from trivia_generator.web_scraper import Article
@@ -316,7 +316,7 @@ class DBConn:
         db.close()
         return tunit
 
-    def select_tunit_category(self, category: str) -> List[TUnit]:
+    def select_tunit_category(self, category: str) -> list:
         """Gets a list of TUnits from the database by category.
 
         :param category: the category used to to find TUnits
@@ -381,7 +381,7 @@ class DBConn:
             db_tunit["rank"]
         )
 
-    def select_tunit_location(self, lat: float, long: float) -> List[TUnit]:
+    def select_tunit_location(self, lat: float, long: float) -> list:
         """Gets a list of TUnits from the database by location.
 
         :param lat: a latitude coordinate
@@ -596,7 +596,7 @@ class DBConn:
         db.commit()
         db.close()
 
-    def select_articles_location(self, lat: float, long: float) -> List[Article]:
+    def select_articles_location(self, lat: float, long: float) -> list:
         """ Retrieves Articles from the database based on a location
 
         :param lat: the latitude coordinate
