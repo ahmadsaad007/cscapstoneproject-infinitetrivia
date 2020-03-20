@@ -11,6 +11,8 @@ import time
 import requests
 import bs4
 
+from database_connection.dbconn import DBConn
+
 from .Article import Article
 
 BASE_URL = 'https://en.wikipedia.org/wiki/'
@@ -18,19 +20,18 @@ RANDOM_URL = 'https://en.wikipedia.org/wiki/Special:Random'
 LOCATION_URL_FORMAT = 'https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gsradius=%d&gscoord=%lf|%lf&format=json'
 
 
-# TODO move DB functions to DBConn.
-
-
-
 def get_page_by_category(category: str) -> Article:
     """Gets the contents and metadata of a Wikipedia article with a given category.
 
     :param category: the category with which to search.
     :type category: str
-    :returns: the Article object representing the Wikipedia article.
+    :returns: the Article obj ect representing the Wikipedia article.
 
     """
     articles_with_category = DBConn().select_category_articles(category)
+    if not articles_with_category:
+        return None
+
     article_id, title = random.choice(articles_with_category)
     url = BASE_URL + title.replace(' ', '_')
     page_html = _get_page_from_title(title)
@@ -70,6 +71,8 @@ def get_page_by_location(latitude: float, longitude: float, radius: int) -> Arti
     """
 
     nearby_articles = _get_nearby_articles(latitude, longitude, radius)
+    if not nearby_articles:
+        return None
 
     page_html = None
     url = None
@@ -106,8 +109,10 @@ def _get_nearby_articles(latitude: float, longitude: float, radius: int) -> list
     except requests.Timeout:
         return None
 
-    #TODO add error handling for JSON.
-    article_titles = [page['title'].replace(' ', '_') for page in res['query']['geosearch']]
+    if 'query' in res.keys():
+        article_titles = [page['title'].replace(' ', '_') for page in res['query']['geosearch']]
+    else:
+        return None
 
     return article_titles
 
@@ -176,11 +181,15 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
     for tag in soup.findAll('p'):
         content += ''.join(tag.strings) + '\n'
 
-    # TODO check if categories are in base category list.
-    categories = []
-    categories_div = soup.find('div', {'id': 'mw-normal-catlinks'})
-    for li in categories_div.ul.children:
-        categories.append(li.text)
+    categories = DBConn().select_article_categories(article_id)
+    # Convert list of tuples to list of strings.
+    categories = [category[0] for category in categories]
+
+    # Get categories from original Wikipedia article.
+    # categories_div = soup.find('div', {'id': 'mw-normal-catlinks'})
+    # if categories_div.ul.children:
+    #     for li in categories_div.ul.children:
+    #         categories.append(li.text)
 
     long_span = soup.find('span', {'class': 'longitude'})
     lat_span = soup.find('span', {'class': 'latitude'})
@@ -191,7 +200,7 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
     else:
         longitude = None
         latitude = None
-    # print(content, url, categories, 1, access_timestamp, latitude, longitude)
+    
     article = Article(content, url, article_id, categories, access_timestamp, latitude, longitude)
     return article
 
@@ -224,11 +233,3 @@ def convert_dms_to_decimal(dms_coord: str) -> float:
     except Exception as e:
         print(e, dms_coord)
         return None
-
-
-if __name__ == '__main__':
-    for _ in range(10):
-        # article = get_page_by_location(39.98, -75.16, 10000, )
-        # article = get_page_by_random()
-        article = get_page_by_category("People by status")
-        print(article, '\n')
