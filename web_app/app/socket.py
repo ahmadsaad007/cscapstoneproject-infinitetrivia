@@ -67,6 +67,11 @@ def start_game(code):
     return data
 
 
+@socketio.on('request_scores')
+def request_score(code):
+    pass
+
+
 @socketio.on('request_trivia')
 def request_trivia(code):
     print("got a trivia request from game ", code)
@@ -86,3 +91,16 @@ def submit_answer(data):
     print("got answer:", data['answer'])
     data['sid'] = request.sid
     return games[code].submit_answer(data)
+
+
+@socketio.on('answer_timeout')
+def answer_timeout(code):
+    socketio.emit('answer_timeout', room=code)
+
+
+@socketio.on('get_answers')
+def get_answers(code):
+    print("got request for trivia answers")
+    game = games[code]
+    data = game.get_trivia_answer_and_responses()
+    return data

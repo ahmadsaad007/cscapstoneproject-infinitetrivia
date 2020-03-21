@@ -33,7 +33,8 @@ class Game:
         self.current_state = "LOBBY"
         self.game_started = False
         self.current_trivia = ""
-        self.current_answers = []
+        self.number_of_responses = 0
+        self.current_answer = ""
 
     def add_player_to_lobby(self, player: Player) -> bool:
         """Adds a player to the current game lobby.
@@ -96,9 +97,11 @@ class Game:
 
         :returns: a trivia question
         """
-        trivia = "Who was the realest in 1865?"
-        self.next_trivia = trivia
-        return trivia
+        trivia_question = "Who was the realest in 1865?"
+        trivia_answer = "Abraham Lincoln"
+        self.current_trivia = trivia_question
+        self.current_answer = trivia_answer
+        return trivia_question
 
     def submit_answer(self, data: dict) -> bool:
         """Retrives an answer the current trivia question from a given player.
@@ -110,7 +113,27 @@ class Game:
             return False
         else:
             player.current_answer = data['answer']
+            self.number_of_responses += 1
+            if self.number_of_responses == self.num_players:
+                pass  # TODO (probably check in socket code)
             return True
+
+    def get_trivia_answer_and_responses(self) -> dict:
+        """Returns the answer to the current trivia, and the responses of each player
+
+        :returns: a dictionary containing the trivia answer, and player answers
+        """
+        data = dict()
+        data['answer'] = self.current_answer
+        self.players.sort(key=lambda p: p.name)
+        data['player_answers'] = dict()
+        for player in self.players:
+            data['player_answers'][player.name] = dict()
+            data['player_answers'][player.name]['answer'] = player.current_answer
+            is_correct = (player.current_answer == self.current_answer)
+            data['player_answers'][player.name]['correct'] = is_correct
+            player.current_answer = ""
+        return data
 
     def display_category_options(self) -> bool:
         """If applicable (depending on game mode), send a list of possible categories that a player can choose from to the front end, which will be displayed to the selected user.

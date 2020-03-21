@@ -120,15 +120,43 @@ function present_trivia(trivia){
     $('#room_container').append("<b>" + trivia + "</b>");
     $('#room_container').append(time_board);
     prompt_response();
-    countdown(30).then(display_answer);
+    countdown(30).then(round_finish);
 }
 
 function prompt_response(){
     socket.emit("prompt_response", get_code());
 }
 
-function display_answer(){
-    console.log("answer!");
+function round_finish(){
+    socket.emit("answer_timeout", get_code());
+    socket.emit("get_answers", get_code(), function(data){
+	display_answer(data);
+    });
+}
+
+function display_answer(data){
+    // TODO
+    console.log("got answer!");
+    const trivia_answer = '<h3>Answer: ' + data['answer'] + '</h3>';
+    const responses = '<h3>Responses:</h3>';
+    const answer_list = '<ul id="answer_list"></ul>';
+    $('#room_container').empty();
+    $('#room_container').append(trivia_answer);
+    $('#room_container').append(responses);
+    $('#room_container').append(answer_list);
+    for (var player in data['player_answers']){
+	let li = '<li>' + player + ': ';
+	li += data['player_answers'][player]['answer'];
+	if (data['player_answers'][player]['correct']){
+	    li += ' (Correct)';
+	} else {
+	    li += ' (Incorrect)';
+	}
+	li += '</li>';
+	$('#answer_list').append(li);
+    }
+    
+    
 }
 
 async function countdown(seconds){
@@ -138,7 +166,6 @@ async function countdown(seconds){
 	counter--;
 	$('#count_number').text(counter.toString());
     }
-    // display trivia
 }
 
 function add_start_game_button(){

@@ -6,8 +6,8 @@ $("#join_room_button").on("click", join_game);
 socket.on('display_splash_screen', function(round_number){
     display_splash_screen(round_number);
 });
-
 socket.on('display_text_response_prompt', display_text_response_prompt);
+socket.on('answer_timeout', display_timeout_message);
 
 var code = undefined;
 
@@ -92,6 +92,14 @@ function display_text_response_prompt(){
     $('#game_container').append(submit);
     // connect button to submit event
     $('#submit').on('click', submit_text_answer);
+}
+
+function display_timeout_message(){
+    // check if submit id still exits
+    if ($('#submit').length){
+	$('#game_container').empty();
+	$('#game_container').append("<h3>Time is up!</h3>");
+    }
 }
 
 
