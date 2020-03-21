@@ -5,6 +5,7 @@ Player
 
 from dataclasses import dataclass
 
+
 @dataclass
 class Player:
     """Class which represents a player in a class.
@@ -19,6 +20,7 @@ class Player:
 
     name: str
     ID: str
+    current_answer: str
     connected: bool
     current_score: int
     is_registered: bool

@@ -25,11 +25,15 @@ class Game:
                  game_settings: GameSettings,
                  host_id: str):
         self.players = []
+        self.num_players = 0
         self.game_code = game_code
         self.game_settings = game_settings
         self.host_id = host_id
         self.round_number = 0
         self.current_state = "LOBBY"
+        self.game_started = False
+        self.current_trivia = ""
+        self.current_answers = []
 
     def add_player_to_lobby(self, player: Player) -> bool:
         """Adds a player to the current game lobby.
@@ -38,8 +42,12 @@ class Game:
         :type player: Player
         :returns: True if player was successfully added to lobby, False otherwise
         """
-        self.players.append(player)
-        return True
+        if not self.game_started:
+            self.players.append(player)
+            self.num_players += 1
+            return True
+        else:
+            return False
 
     def remove_player_from_lobby(self, player: Player) -> bool:
         """Removes a player from the current game lobby.
@@ -49,6 +57,7 @@ class Game:
         :returns: True if player was successfully removed from lobby, False otherwise
         """
         self.players.remove(player)
+        self.num_players -= 1
         return True
 
     def start_game(self) -> bool:
@@ -56,28 +65,52 @@ class Game:
 
         :returns: True if the game session was successfully started, false otherwise
         """
-        pass
+        self.game_started = True
+        self.round_number = 1
+        return True
 
-    def display_score(self) -> bool:
-        """Sends instructions to front end to display score information to the host screen and player(s).
+    def get_round_number(self) -> int:
+        """Returns the current game round.
 
-        :returns: True if score information was successfully sent to front end, false otherwise
+        :returns: the current game round number as an integer
         """
-        pass
+        return self.round_number
 
-    def present_trivia(self) -> bool:
-        """Sends the next trivia question to the front end, so it can be displayed on host screen.
+    def get_score(self) -> dict:
+        """creates and returns dictionary with the name and score of each player in game 
 
-        :returns: True if trivia question was properly fetched and sent to front end, False otherwise
+        :returns: a dictionary containinging the score of each player 
         """
-        pass
+        data = dict()
+        data['players'] = []
+        self.players.sort(key=lambda p: p.current_score, reverse=True)
+        for player in self.players:
+            player_entry = dict()
+            player_entry['name'] = player.name
+            player_entry['score'] = player.current_score
+            data['players'].append(player_entry)
+        return data
 
-    def get_next_trivia(self) -> bool:
+    def get_next_trivia(self) -> str:
         """Fetches a trivia question for the upcoming round from the trivia database, based on the current GameSettings.
 
-        :returns: True if trivia question was properly fetched from database, False otherwise
+        :returns: a trivia question
         """
-        pass
+        trivia = "Who was the realest in 1865?"
+        self.next_trivia = trivia
+        return trivia
+
+    def submit_answer(self, data: dict) -> bool:
+        """Retrives an answer the current trivia question from a given player.
+
+        :returns: True if answer was successfully submitted, False otherwise
+        """
+        player = self.get_player_by_sid(data['sid'])
+        if player is None:
+            return False
+        else:
+            player.current_answer = data['answer']
+            return True
 
     def display_category_options(self) -> bool:
         """If applicable (depending on game mode), send a list of possible categories that a player can choose from to the front end, which will be displayed to the selected user.
@@ -86,34 +119,8 @@ class Game:
         """
         pass
 
-    def fetch_response(self) -> bool:
-        """Fetches the answers to a trivia question from each player from the front end.
-
-        :returns: True if all answers were fetched from front-end.
-        """
-        pass
-
-    def display_winner(self) -> bool:
-        """Send information about the winner of a game session to the front end.
-
-        :returns: True if info about winner was successfully sent to frontend, false otherwise.
-        """
-        pass
-
-    def display_winners_of_round(self) -> bool:
-        """Send information about the winner(s) of the round to the front end. 
-
-        :returns: True if info about winner(s) of the round was successfully sent to frontend, False otherwise.
-        """
-        pass
-
     def determine_winners_of_round(self):
         """Based of off the current trivia and the received answers from each player, determine who won the round.
-        """
-        pass
-
-    def update_state(self):
-        """Updates the current state of the game. 
         """
         pass
 
@@ -130,3 +137,13 @@ class Game:
         :returns: True if info was successfully sent to front-end and user statistics were updated, false otherwise
         """
         pass
+
+    def get_player_by_sid(self, sid: str) -> Player:
+        """Returns the given player in game based off of their SID, or None if not found.
+
+        :returns: The player corresponding to the given SID, or None if not found
+        """
+        for player in self.players:
+            if sid == player.ID:
+                return player
+        return None

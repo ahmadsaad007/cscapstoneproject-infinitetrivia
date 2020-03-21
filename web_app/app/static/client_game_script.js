@@ -3,10 +3,13 @@ var socket = io.connect('http://' + document.domain + ":" + location.port);
 $("#join_room_button").on("click", join_game);
 
 // connect socket to events
-socket.on('display_splash_screen', display_splash_screen);
+socket.on('display_splash_screen', function(round_number){
+    display_splash_screen(round_number);
+});
+
 socket.on('display_text_response_prompt', display_text_response_prompt);
 
-console.log("reporting from client game script!");
+var code = undefined;
 
 function join_game(){
     console.log("attempting to join game!");
@@ -31,6 +34,7 @@ function join_game(){
 	    break;
 	case "ADDED_TO_LOBBY":
 	    console.log("successfully added to lobby");
+	    code = entered_code;
 	    display_game_lobby();
 	    break;
 	default:
@@ -40,6 +44,7 @@ function join_game(){
     });
 }
 
+
 function display_game_code_error(){
   console.log("invalid game code.");
   error_div = $( '#code_error_container' );
@@ -47,6 +52,7 @@ function display_game_code_error(){
   error_div.append("Invalid Code!");
   $( '#room_code' ).val("");
 };
+
 
 function display_game_name_error(){
   console.log("invalid name.");
@@ -56,6 +62,7 @@ function display_game_name_error(){
   $( '#game_name' ).val("");
 };
 
+
 function display_join_error(){
     console.log("could not join game.");
   error_div = $( '#name_error_container' );
@@ -63,21 +70,46 @@ function display_join_error(){
   error_div.append("Could Not Join Game!");
 }
 
+
 function display_game_lobby(){
     $( '#home_screen_container').remove();
     $( '#game_container' ).append("<h3>Waiting for game to start...</h3>");
 }
 
-function display_splash_screen(){
+
+function display_splash_screen(round_number){
     $('#game_container').empty();
     // TODO update round 
-    $('#game_container').append("<h3>Round 1<\h3>");
+    $('#game_container').append("<h3>Round " + round_number + "<\h3>");
 }
+
 
 function display_text_response_prompt(){
     const prompt = '<b>Answer:</b> <input id="text_answer">';
-    const submit = '<button type="button">Submit!</button>';
+    const submit = '<button type="button" id="submit">Submit!</button>';
     $('#game_container').empty();
     $('#game_container').append(prompt);
     $('#game_container').append(submit);
+    // connect button to submit event
+    $('#submit').on('click', submit_text_answer);
+}
+
+
+function submit_text_answer(){
+    let answer = $('#text_answer').val();
+    console.log(answer);
+    // TODO: send answer over to server
+    socket.emit('submit_answer', {code: code, answer: answer}, function(status){
+	submitted_answer(status);
+    });
+    // remove answer area
+}
+
+function submitted_answer(status){
+    if (status){
+	$('#game_container').empty();
+	$('#game_container').append('<h3>Submitted Response!</h3>');
+    } else {
+	console.log("failed to submit answer!");
+    }
 }

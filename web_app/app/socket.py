@@ -32,7 +32,8 @@ def join_game(data):
                     ID=request.sid,
                     connected=True,
                     current_score=0,
-                    is_registered=False)  # TODO
+                    is_registered=False,  # TODO
+                    current_answer="")
     game = games[code]
     if not game.add_player_to_lobby(player):
         print("error: could not join")
@@ -58,28 +59,30 @@ def on_disconnect():
 
 @socketio.on('start_game')
 def start_game(code):
-    # TODO get round number and send it to players
-    socketio.emit("display_splash_screen", room=code)
-    players = games[code].players
-    data = dict()
-    data['players'] = []
-    players.sort(key=lambda p: p.current_score, reverse=True)
-    for player in players:
-        player_entry = dict()
-        player_entry['name'] = player.name
-        player_entry['score'] = player.current_score
-        data['players'].append(player_entry)
-    print(data)
+    game = games[code]
+    game.start_game()
+    data = game.get_score()
+    round_number = game.get_round_number()
+    socketio.emit("display_splash_screen", round_number, room=code)
     return data
 
 
 @socketio.on('request_trivia')
 def request_trivia(code):
     print("got a trivia request from game ", code)
-    return "Who was the realest in 1865?"
+    return games[code].get_next_trivia()
 
 
 @socketio.on('prompt_response')
 def prompt_response(code):
     print("prompting for response")
     socketio.emit('display_text_response_prompt', room=code)
+
+
+@socketio.on('submit_answer')
+def submit_answer(data):
+    code = data['code']
+    # TODO validate answer
+    print("got answer:", data['answer'])
+    data['sid'] = request.sid
+    return games[code].submit_answer(data)
