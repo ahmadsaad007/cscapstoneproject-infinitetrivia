@@ -133,7 +133,16 @@ class Game:
             is_correct = (player.current_answer == self.current_answer)
             data['player_answers'][player.name]['correct'] = is_correct
             player.current_answer = ""
+        self.round_number += 1
+        self.update_scores(data)
         return data
+
+    def update_scores(self, data):
+        """Updates the scores of each player based on the data of each player."""
+        for player in self.players:
+            if data['player_answers'][player.name]['correct']:
+                # TODO determine how many points they should get
+                player.update_score(1)
 
     def display_category_options(self) -> bool:
         """If applicable (depending on game mode), send a list of possible categories that a player can choose from to the front end, which will be displayed to the selected user.

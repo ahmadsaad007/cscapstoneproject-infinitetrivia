@@ -90,7 +90,7 @@ function remove_player_from_lobby(name){
 function display_score(data){
     const title = "<h3>Score:</h3>";
     const score_board = "<ul id=score_board/>";
-    var counter_display = '<h3 id="counter_display">Round starts in ';
+    var counter_display = '<h3 id="counter_display">Next round starts in ';
     counter_display += '<b id="count_number">5</b> seconds</h3>';
     let players = data['players'];
     console.log(players);
@@ -155,8 +155,11 @@ function display_answer(data){
 	li += '</li>';
 	$('#answer_list').append(li);
     }
-    
-    
+    countdown(5).then( function(){
+	socket.emit('request_scores', get_code(), function(data){
+	    display_score(data);
+	});
+    });
 }
 
 async function countdown(seconds){

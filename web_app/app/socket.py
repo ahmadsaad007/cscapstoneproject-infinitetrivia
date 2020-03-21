@@ -68,8 +68,14 @@ def start_game(code):
 
 
 @socketio.on('request_scores')
-def request_score(code):
-    pass
+def request_scores(code):
+    game = games[code]
+    scores = game.get_score()
+    print("got request for scores!")
+    print(scores)
+    round_number = game.get_round_number()
+    socketio.emit('display_splash_screen', round_number, room=code)
+    return scores
 
 
 @socketio.on('request_trivia')

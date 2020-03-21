@@ -29,7 +29,7 @@ class Player:
         """Returns the name of the player. The name of the user is the currently registered name in the game session.
         :returns: the name of the user
         """
-        pass
+        return self.name
 
     def get_current_room(self) -> int:
         """Returns the integer ID of the current room the player is in.
@@ -43,7 +43,7 @@ class Player:
 
         :returns: True if the player is currently connected, False otherwise
         """
-        pass
+        return self.connected
 
     def update_score(self, increment: int) -> bool:
         """Updates the current score of the player by *increment*.
@@ -51,14 +51,15 @@ class Player:
         :param increment: the value the player's score should be incremented by
         :returns: True if the player's score was successfully updated, false otherwise.
         """
-        pass
+        self.current_score += increment
+        return True
 
     def get_current_score(self) -> int:
         """Returns the current score of the player.
 
         :returns: the current score of the player.
         """
-        pass
+        return self.current_score
 
     def update_statistics(self, game_settings, player_db_handle) -> bool:
         """Updates the Player's statistics stored in *player_db_handle* based off of *game_settings*.
@@ -74,11 +75,11 @@ class Player:
 
         :returns: True if the player is registered, False if not.
         """
-        pass
+        return self.is_registered
 
     def get_id(self) -> int:
         """Returns the unique ID of the user.
 
         :returns: the ID of the user, or -1 if the user does not have a valid ID.
         """
-        pass
+        return self.ID
