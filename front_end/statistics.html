@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Infinite Trivia</title>
+    <link rel="stylesheet" href="statistics.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+
+</head>
+<body>
+  <div class="container">
+    <div class="side">
+      <h1>Infinite Stats</h1>
+      <ul class="links">
+        <li><a href="#" class="selected" data-metric="time">Time Played</a></li>
+        <li><a href="#" data-metric="games">Games Played</a></li>
+        <li><a href="#" data-metric="points">Total Points</a></li>
+      </ul>
+      <div class="stats">
+        <ul data-metric="time">
+          <li>
+            <div class="key">Time Played</div>
+            <div class="val">356</div>
+          </li>
+          <li>
+            <div class="key">Weekly Average</div>
+            <div class="val">50.9</div>
+          </li>
+         
+        </ul>
+        <ul data-metric="games">
+          <li>
+            <div class="key">Total Games Played</div>
+            <div class="val">468</div>
+          </li>
+          <li>
+            <div class="key">Weekly Average</div>
+            <div class="val">66.9</div>
+          </li>
+         
+        </ul>
+        <ul data-metric="points">
+          <li>
+            <div class="key">Total Points</div>
+            <div class="val">456</div>
+          </li>
+          <li>
+            <div class="key">Average</div>
+            <div class="val">65.1</div>
+          </li>
+        
+        </ul>
+      </div>
+      <ul>
+        <li>
+          <div class="key">Last Played</div>
+          <div class="val">7 days ago</div>
+        </li>
+        <li>
+          <div class="key">Timezone</div>
+          <div class="val">EDT</div>
+        </li>
+        <li>
+          <div class="key">User Name</div>
+          <div class="val">serc dweller</div>
+        </li>
+      </ul>
+    </div>
+    <div class="main">
+      <ul>
+        <li class="active">
+          <article tabindex="0" data-metric="time">
+            <div class="area">
+              <div class="lines">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+              <div class="data time">
+                <dl>
+                  <dt>3/8</dt>
+                  <dd>36</dd>
+                </dl>
+                <dl>
+                  <dt>3/9</dt>
+                  <dd>44</dd>
+                </dl>
+                <dl>
+                  <dt>3/10</dt>
+                  <dd>52</dd>
+                </dl>
+                <dl>
+                  <dt>3/11</dt>
+                  <dd>32</dd>
+                </dl>
+                <dl>
+                  <dt>3/12</dt>
+                  <dd>44</dd>
+                </dl>
+                <dl>
+                  <dt>3/13</dt>
+                  <dd>68</dd>
+                </dl>
+                <dl>
+                  <dt>3/14</dt>
+                  <dd>80</dd>
+                </dl>
+              </div>
+            </div>
+            <h1>Time Played</h1>
+          </article>
+        </li>
+        <li>
+          <article tabindex="0" data-metric="games">
+            <div class="area">
+              <div class="lines">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+              <div class="data games">
+                <dl>
+                  <dt>3/8</dt>
+                  <dd>72</dd>
+                </dl>
+                <dl>
+                  <dt>3/9</dt>
+                  <dd>56</dd>
+                </dl>
+                <dl>
+                  <dt>3/10</dt>
+                  <dd>64</dd>
+                </dl>
+                <dl>
+                  <dt>3/11</dt>
+                  <dd>48</dd>
+                </dl>
+                <dl>
+                  <dt>3/12</dt>
+                  <dd>64</dd>
+                </dl>
+                <dl>
+                  <dt>3/13</dt>
+                  <dd>80</dd>
+                </dl>
+                <dl>
+                  <dt>3/14</dt>
+                  <dd>84</dd>
+                </dl>
+              </div>
+            </div>
+            <h1>Games Played</h1>
+          </article>
+        </li>
+        <li>
+          <article tabindex="0" data-metric="points">
+            <div class="area">
+              <div class="lines">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+              <div class="data points">
+                <dl>
+                  <dt>3/8</dt>
+                  <dd>76</dd>
+                </dl>
+                <dl>
+                  <dt>3/9</dt>
+                  <dd>88</dd>
+                </dl>
+                <dl>
+                  <dt>3/10</dt>
+                  <dd>72</dd>
+                </dl>
+                <dl>
+                  <dt>3/11</dt>
+                  <dd>68</dd>
+                </dl>
+                <dl>
+                  <dt>3/12</dt>
+                  <dd>52</dd>
+                </dl>
+                <dl>
+                  <dt>3/13</dt>
+                  <dd>60</dd>
+                </dl>
+                <dl>
+                  <dt>3/14</dt>
+                  <dd>40</dd>
+                </dl>
+              </div>
+            </div>
+            <h1>Total Points</h1>
+          </article>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+  <script src="statistics.js"></script>
+ 
+</body>
+</html>
