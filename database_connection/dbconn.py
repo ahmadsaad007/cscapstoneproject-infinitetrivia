@@ -5,7 +5,6 @@ Database Connection
 from dataclasses import dataclass
 import sqlite3
 
-from game_models.Player import Player
 from trivia_generator import TUnit
 from typing import List
 from trivia_generator.web_scraper import Article
