@@ -2,18 +2,22 @@
 NLP Pre-processor
 =================
 """
+import os
 
 import spacy
 from spacy.tokens import Span, Token
 from spacy.matcher import PhraseMatcher
 
-from .web_scraper import Article
-from .web_scraper import get_page_by_random
-from .TUnit import TUnit
+from trivia_generator.web_scraper import Article
+from trivia_generator.web_scraper.WebScraper import get_page_by_random
+from trivia_generator.TUnit import TUnit
+
+TOP_LEVEL_DIR = os.path.abspath('../')
+contradictory_path = TOP_LEVEL_DIR + '/contradictatory.txt'
 
 
 def _init_contradictatory_matcher():
-    with open('contradictatory.txt', 'r') as f:
+    with open(contradictory_path, 'r') as f:
         contradictatory_words = f.read().splitlines()
         contradictatory_matcher = PhraseMatcher(nlp.vocab)
         patterns = [nlp.make_doc(text) for text in contradictatory_words]
