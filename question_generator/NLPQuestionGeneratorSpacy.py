@@ -1,4 +1,3 @@
-import wikipedia
 import numpy as np
 import spacy
 
