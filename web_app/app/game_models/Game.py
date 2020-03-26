@@ -2,9 +2,13 @@
 Game
 ====
 """
+import random
 
 from .Player import Player
 from .GameSettings import GameSettings
+from trivia_generator.web_scraper.WebScraper import get_page_by_random
+from trivia_generator.NLPPreProcessor import create_TUnits
+from question_generator.NLPQuestionGenerator import nlp_generate_trivia_question
 
 
 class Game:
@@ -97,8 +101,10 @@ class Game:
 
         :returns: a trivia question
         """
-        trivia_question = "Who was the realest in 1865?"
-        trivia_answer = "Abraham Lincoln"
+        trivia_article = get_page_by_random()
+        tunit_list = create_TUnits(trivia_article)
+        tunit = random.choice(tunit_list)
+        trivia_question, trivia_answer = nlp_generate_trivia_question(tunit)
         self.current_trivia = trivia_question
         self.current_answer = trivia_answer
         return trivia_question
