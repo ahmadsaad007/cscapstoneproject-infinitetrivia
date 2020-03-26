@@ -12,7 +12,7 @@ from trivia_generator.web_scraper import Article
 from trivia_generator.web_scraper.WebScraper import get_page_by_random
 from trivia_generator.TUnit import TUnit
 
-TOP_LEVEL_DIR = os.path.abspath('../')
+TOP_LEVEL_DIR = '.' # os.path.abspath('../')
 contradictory_path = TOP_LEVEL_DIR + '/contradictatory.txt'
 
 
@@ -24,7 +24,7 @@ def _init_contradictatory_matcher():
         contradictatory_matcher.add("ContradictoryTokens", None, *patterns)
         return contradictatory_matcher
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_lg")
 contradictatory_matcher = _init_contradictatory_matcher()
 
 def _lemmatize(tok):
@@ -47,11 +47,11 @@ def _count_syllables(word):
     return syllable_count
 
 def _get_features(sentence: spacy.tokens.Span) -> tuple:
-    has_superlatives = any([t.tag_ == 'JJS' for t in sentence])
-    has_contradictatory = any(contradictatory_matcher(nlp(sentence.string)))
+    has_superlatives = int(any([t.tag_ == 'JJS' for t in sentence]))
+    has_contradictatory = int(any(contradictatory_matcher(nlp(sentence.string))))
 
-    sent_subjs = [t for t in sentence if t.dep_ == 'nsubj']
-    sent_subj = _lemmatize(sent_subjs[0]) if sent_subjs else None
+    # sent_subjs = [t for t in sentence if t.dep_ == 'nsubj']
+    # sent_subj = _lemmatize(sent_subjs[0]) if sent_subjs else None
 
     num_complex_words = len([t for t in sentence if _count_syllables(t.text) > 2])
 
@@ -61,8 +61,8 @@ def _get_features(sentence: spacy.tokens.Span) -> tuple:
     return (
         has_superlatives,
         has_contradictatory,
-        _lemmatize(sentence.root),
-        sent_subj,
+        # _lemmatize(sentence.root),
+        # sent_subj,
         fog
     )
 
@@ -81,26 +81,24 @@ def create_TUnits(article: Article) -> list:
 
     for sent in list(doc.sents):
         # print(sent)
-        has_superlatives, has_contradictatory, sent_root, sent_subj, fog = _get_features(sent)
+        has_superlatives, has_contradictatory, fog = _get_features(sent)
         tunits.append(
             TUnit(
                 sent.string,
-                1,
+                article.article_id,
                 article.url,
-                article.categories,
                 article.access_timestamp,
                 has_superlatives,
                 has_contradictatory,
-                sent_root,
-                sent_subj,
                 fog,
+                None,
                 article.latitude,
                 article.longitude,
-                None,
-                None
+                0,
+                0,
+                0
             )
         )
-   
 
     return tunits
 
