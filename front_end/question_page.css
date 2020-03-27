@@ -1,0 +1,51 @@
+@import url(https://fonts.googleapis.com/css?family=Shanti|Salsa);
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: radial-gradient(#b4c5cf, #447891);
+  background-attachment: fixed;
+}
+
+body {
+  margin: 20px;
+  font: 24px/1 'Salsa', sans-serif;
+  color: #fff;
+  text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+}
+
+  
+  a {
+      color: #2A679F;
+  }
+  /*========*/
+  
+a {
+  color: #ffefb2;
+  text-decoration: none;
+}
+
+h1, h2 {
+  margin: 0 0 0 140px;
+  font-weight: normal;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 10px;
+  font-size: 60px;
+  color: #ffefb2;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: inherit;
+}
+
+
+.main {
+  margin-left: 140px;
+}
+
