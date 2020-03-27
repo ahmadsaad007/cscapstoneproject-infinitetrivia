@@ -7,6 +7,7 @@ body {
     rgba(246,247,249,0.8)),
     url(https://dl.dropboxusercontent.com/u/22006283/preview/codepen/sky-clouds-cloudy-mountain.jpg) no-repeat center center fixed;
   background-size: cover;
+  background:#0CF;
 }
 
 .container {
@@ -313,7 +314,7 @@ label {
 	border: none;
 	border-radius: 20px;
   margin-top: 23px;
-  background-color: #1059FF;
+  background-color:#0CF;
 }
 
 .btn-signin {
@@ -324,6 +325,7 @@ label {
 	border: none;
 	border-radius: 20px;
   margin-top: -8px;
+  background-color:#0CF;
 }
 
 .btn-animate {
