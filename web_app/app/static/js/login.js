@@ -10,7 +10,7 @@ $(function() {
 	});
 });
 
-$(function() {
+$(function new_registration() {
 	$(".btn-signup").click(function() {
   $(".nav").toggleClass("nav-up");
   $(".form-signup-left").toggleClass("form-signup-down");

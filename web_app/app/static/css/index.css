@@ -2,6 +2,14 @@ html {
     height: 100%;
 }
 
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+}
 
 body {
     background-color: #2F3035;
