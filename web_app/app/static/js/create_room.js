@@ -24,7 +24,7 @@ function create_room(){
     CODE = code;
     game_options.code = code;
 
-    $( '#create_room_options').remove();
+    $('#create_room_options').remove();
     // ask server to create game session
     socket.emit('create_game', game_options, function(val) {
 	add_lobby_html(val);

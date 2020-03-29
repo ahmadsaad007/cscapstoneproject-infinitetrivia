@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="answer_page.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/answer_page.css') }}">
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script>
+        window.onload = function(){
+            
+        }
+    </script>
     <title>Infinite Game Page</title>
 </head>
 <body>
@@ -17,6 +22,6 @@
         </form>
       
     </div>
-    
+    <script type="text/javascript" src="{{ url_for('static', filename='js/client_game_script.js') }}"></script>
 </body>
 </html>
