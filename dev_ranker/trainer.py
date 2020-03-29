@@ -41,7 +41,7 @@ def request_trivia(info):
     trivia = None
     for tunit in tunit_list:
         if is_interesting(tunit):
-            trivia = tunit.sentence
+            trivia = tunit
             print('interesting trivia!!!')
             break
     if trivia is None:
