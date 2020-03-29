@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Infinite Trivia</title>
-    <link rel="stylesheet" href="css/statistics.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/statistics.css') }}">
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 
 
@@ -210,7 +210,7 @@
     </div>
   </div>
   
-  <script src="js/statistics.js"></script>
+  <script src="{{ url_for('static', filename='js/statistics.js') }}"></script>
  
 </body>
 </html>
