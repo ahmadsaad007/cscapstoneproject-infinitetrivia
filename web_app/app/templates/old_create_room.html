@@ -1,17 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/question_page.css') }}">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
-  <title>Infinite Questions</title>
-</head>
-<body>
-  <h1>Infinite Trivia</h1>
-
-  <div id="room_container">
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Create Room</title>
+  </head>
+  <body>
+    <!-- scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <div id="room_container"/>
       <div id="create_room_options">
         <h2>Create A Room Here</h2>
         <div id="radio_buttons">
@@ -27,9 +24,10 @@
       </div>
       
       <br>
-    <button type="button" id="create_room_button">Create Room!</button>
-  </div>
+      <button type="button" id="create_room_button">Create Room!</button>
+    </div>
+    <!-- buttons -->
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/create_room.js') }}"></script>
-</body>
+  </body>
 </html>

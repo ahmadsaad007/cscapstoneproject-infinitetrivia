@@ -1,34 +1,57 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Infinite Trivia Home</title>
-  </head>
-  <body>
-    <!-- Jquery and SocketIO  -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Infinite Trivia</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+</head>
+<body>
 
-    <div id="home_screen_container">
-      <!-- welcome screen -->
-      <h2>Welcome To Infinite Trivia!!</h2>
-      <!-- Create Room  -->
-      <a href="{{ url_for('create_room_page') }}">Create Room</a>      
-      <br><br>
-      <!-- Join Room -->
-      <label for="room_code">Room Code</label>
-      <br>
-      <input type="text" maxlength="4" name="room_code" id="room_code"/>
-      <div id="code_error_container"> </div>
-      <label for="game_name">Name</label>
-      <br>
-      <input type="text" maxlength="16" name="game_name" id="game_name"/>
-      <div id="name_error_container"> </div>
-      <br>
-      <button type="button" id="join_room_button">Join Room</button>
+  <div class="container">
+    
+    <header> </header>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="{{ url_for('login_page') }}">LOGIN/REGISTER</a>
+      <!--<a href="#" id="registration-button">REGISTRATION</a>-->          
+    </nav> 
+      
+    <div class="container" id="home_screen_container">  
+      <div id="contact" action="" method="post">
+        <h3>Infinite Trivia</h3>
+        <h4><img src="{{ url_for('static', filename='img/expandingyeet.png') }}" alt="cat"></h4>
+
+        <form>
+          <button type="continue" formaction="{{ url_for('create_room_page') }}">Create Room</button>
+        </form>
+      
+        <form>
+          <fieldset>
+            <input placeholder="Name" type="text" tabindex="1" required autofocus id="game_name">
+            <div id="code_error_container"></div>
+          </fieldset>
+          <fieldset>
+            <input placeholder="Room Code" type="email" tabindex="2" required id="room_code">
+            <div id="name_error_container"> </div>
+          </fieldset>
+            
+          <fieldset>
+            <button name="submit" type="submit" id="join_room_button" data-submit="...Sending">Join Room</button>
+          </fieldset>
+        </form>
+
+      </div>
     </div>
     <div id="game_container"></div>
-    <!-- script -->
-    <script type="text/javascript" src="{{ url_for('static', filename='client_game_script.js') }}"></script>
-  </body>
+
+    <footer></footer>
+    
+  </div>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/client_game_script.js') }}"></script>
+</body>
 </html>
+
