@@ -1,11 +1,15 @@
 import itertools
+
 import numpy as np
 from scipy import stats
 import pylab as pl
 from sklearn import svm, linear_model
 import sklearn.model_selection
 import spacy
-nlp = spacy.load('en_core_web_lg') 
+
+from nlp_helpers import NLPConn
+
+nlp = NLPConn.get_nlp_conn()
 
 #Algorithm for Rank SVM for ranking the trivia
 def rankSVM(trainX, trainY):

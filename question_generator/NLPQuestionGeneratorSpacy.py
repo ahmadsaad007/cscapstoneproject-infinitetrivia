@@ -1,9 +1,8 @@
-import wikipedia
 import numpy as np
 import spacy
+from nlp_helpers import NLPConn
 
-
-nlp = spacy.load('en_core_web_lg')
+nlp = NLPConn.get_nlp_conn()
 
 
 def fill_in_the_blank_question_generation(sentence):
