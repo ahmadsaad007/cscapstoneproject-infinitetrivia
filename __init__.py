@@ -1,5 +1,5 @@
 import sys
-sys.path.append('..')
+# sys.path.append('..')
 
 from trivia_generator import *
 from database_connection import *
