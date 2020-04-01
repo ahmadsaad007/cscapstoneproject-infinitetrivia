@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import sqlite3
 
 from trivia_generator import TUnit
-from typing import List
+from typing import List, Optional
 from trivia_generator.web_scraper import Article
 
 
@@ -20,20 +20,28 @@ class DBUser:
     num_answered: int = 0
     num_answered_correct: int = 0
 
+    def __eq__(self, other):
+        for variable in self.__dict__.keys():
+            if self.__dict__[variable] != other.__dict__[variable]:
+                return False
+        return True
+
 
 @dataclass
 class DBConn:
-    """Class representing a database connection.
-
-    :param db_filename: the name of the SQLite database file. Will be fetched at runtime from database config file.
+    """
+    Class representing a database connection.
     """
 
-    DB_CONFIG_FILE: str = "database_connection/db.cfg"
+    DB_CONFIG_FILE: str = "db.cfg"
     db_filename: str = None
 
-    def __init__(self):
-        with open(DBConn.DB_CONFIG_FILE, "r") as file:
-            self.db_filename = file.read().split("=")[1]
+    def __init__(self, filename=None):
+        if filename is None:
+            with open(DBConn.DB_CONFIG_FILE, "r") as file:
+                self.db_filename = file.read().split("=")[1]
+        else:
+            self.db_filename = filename
 
     @staticmethod
     def __dict_factory(cursor, row):
@@ -72,7 +80,7 @@ class DBConn:
         cursor.execute(query, (article_id,))
         rows = cursor.fetchall()
         db.close()
-        return rows
+        return [row[0] for row in rows]
 
     def select_category_articles(self, category: str) -> list:
         """Selects the categories associated with the article with the given article id.
@@ -96,6 +104,16 @@ class DBConn:
         return rows
 
     def insert_user(self, user: DBUser, password: str) -> int:
+        """
+        Inserts a user into the database
+
+        :param user: the DBUser object to be added to the database
+        :type user: DBUser
+        :param password: the user's password
+        :type password: str
+        :raises: sqlite3.DatabaseError
+        :return: database user_id or -1 if not found
+        """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
@@ -117,15 +135,15 @@ class DBConn:
         WHERE username = ?
         """
         cursor.execute(query, (user.username,))
-        user_id = cursor.fetchone()
+        user_id = cursor.fetchone()[0]
         db.close()
         return user_id
 
-    def update_user(self, user: DBUser):
-        """Adds or updates a user in the database.
+    def update_user(self, user: DBUser) -> int:
+        """ Updates a user in the database.
 
-        :param user: the Player object to be added to the database
-        :type user: Player
+        :param user: the DBUser object to be added to the database
+        :type user: DBUser
         :raises: sqlite3.DatabaseError
         """
         db = sqlite3.connect(self.db_filename)
@@ -145,9 +163,22 @@ class DBConn:
             user.username
         ))
         db.commit()
+        query = """
+        SELECT user_id
+        FROM user
+        WHERE username = ?
+        """
+        cursor.execute(query, (user.username,))
+        rows = cursor.fetchone()
+        if rows is not None:
+            user_id = rows[0]
+        else:
+            user_id = -1
         db.close()
+        print('stuff')
+        return user_id
 
-    def update_password(self, username: str, password: str):
+    def update_password(self, username: str, password: str) -> int:
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
@@ -159,7 +190,7 @@ class DBConn:
         db.commit()
         db.close()
 
-    def select_user(self, username: str) -> DBUser:
+    def select_user(self, username: str) -> Optional[DBUser]:
         """Gets a user from the database by username.
 
         :param username: username to be retrieved
@@ -178,9 +209,12 @@ class DBConn:
         cursor.execute(query, (username,))
         user = cursor.fetchone()
         db.close()
-        return DBUser(*user)
+        if user is not None:
+            return DBUser(*user)
+        else:
+            return None
 
-    def delete_user(self, user: DBUser):
+    def delete_user(self, user: DBUser) -> None:
         """Deletes a user from the database.
 
         :param user: a users's object to be deleted from database
@@ -196,6 +230,8 @@ class DBConn:
         cursor.execute(query, (user.username,))
         db.commit()
         db.close()
+
+    # TODO(ALEX): fix tunit and question methods when format finalized
 
     def insert_tunit(self, tunit: TUnit) -> int:
         db = sqlite3.connect(self.db_filename)
@@ -465,7 +501,7 @@ class DBConn:
         db.commit()
         db.close()
 
-    def insert_question(self, question: str, answer: str, tunit: TUnit) -> str:
+    def insert_question(self, question: str, answer: str, t_unit_id: int) -> str:
         """Adds a question entry in the database.
 
         :param question: the question text to be added
@@ -480,7 +516,7 @@ class DBConn:
         INSERT INTO question (t_unit_id, text, answer)
         VALUES (?,?,?)
         """
-        cursor.execute(query, (tunit["t_unit_Id"], question, answer))
+        cursor.execute(query, (t_unit_id, question, answer))
         db.commit()
         query = """
         SELECT qu_id
@@ -610,9 +646,9 @@ class DBConn:
         db.row_factory = self.__dict_factory
         cursor = db.cursor()
         query = """
-        SELECT article_id, title
-        FROM article
-        JOIN t_unit tu on article.article_id = tu.article_id
+        SELECT a.article_id, title
+        FROM article a
+        JOIN t_unit tu on a.article_id = tu.article_id
         WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5 AND
         tu.long > ? - 0.5 AND tu.long < ? + 0.5
         """
