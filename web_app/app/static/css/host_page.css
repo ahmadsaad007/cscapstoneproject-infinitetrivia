@@ -33,6 +33,17 @@ h1, h2 {
   text-align: center;
 }
 
+ul {
+    display: table;
+    margin: 0 auto;
+}
+
+li {
+    margin: 0 0 0 120px;
+    font-weight: normal;
+    text-align: center;
+}
+
 h1 {
   margin-bottom: 10px;
   font-size: 60px;
@@ -47,5 +58,9 @@ h2 {
 
 .main {
   margin-left: 140px;
+}
+
+div {
+    text-align: center;
 }
 

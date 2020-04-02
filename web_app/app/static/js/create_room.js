@@ -64,7 +64,7 @@ function create_room_code(){
 function add_lobby_html(code){
     room_container = $( "#room_container" );
     room_container.append('<h2 id="room_id">Room ID: </b2>');
-    room_container.append('<p>Connected Players:</p>');
+    room_container.append('<h2>Connected Players:</p>');
     room_container.append('<ul id="player_list"/>');
     $("#room_id").append(code);
 }
@@ -103,6 +103,7 @@ function display_score(data){
 	$('#score_board').append('<li>' + player['name'] + " " +  player['score'] + '</li>');
     }
     console.log(counter_display);
+    $('#room_container').append("<br><br>");
     $('#room_container').append(counter_display);
     countdown(5).then(request_trivia);
 }
@@ -118,6 +119,7 @@ function present_trivia(trivia){
     const time_board = '<h3><b id="count_number">30</b> seconds to answer</h3>';
     $('#room_container').empty();
     $('#room_container').append("<b>" + trivia + "</b>");
+    $('#room_container').append("<br><br>");
     $('#room_container').append(time_board);
     prompt_response();
     countdown(30).then(round_finish);
@@ -142,6 +144,7 @@ function display_answer(data){
     const answer_list = '<ul id="answer_list"></ul>';
     $('#room_container').empty();
     $('#room_container').append(trivia_answer);
+    $('#room_container').append("<br><br>");
     $('#room_container').append(responses);
     $('#room_container').append(answer_list);
     for (var player in data['player_answers']){
