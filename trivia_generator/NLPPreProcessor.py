@@ -32,20 +32,12 @@ def create_TUnits(article: Article) -> list:
     doc = nlp(paragraphs)
 
     for sent in list(doc.sents):
-        # print(sent)
-        has_superlatives = features.get_has_superlatives(sent)
-        has_contradictatory = features.get_has_contradictatory(sent)
-        fog = features.get_fog_score(sent)
-
         tunits.append(
             TUnit(
                 sent.string,
                 article.article_id,
                 article.url,
                 article.access_timestamp,
-                has_superlatives,
-                has_contradictatory,
-                fog,
                 None,
                 article.latitude,
                 article.longitude,
@@ -57,8 +49,6 @@ def create_TUnits(article: Article) -> list:
 
     return tunits
 
-def _to_TUnit(article: Article) -> TUnit:
-    pass
 
 if __name__ == '__main__':
     article = get_page_by_random()
