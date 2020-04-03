@@ -3,18 +3,22 @@ import sqlite3
 def insert_categories():
     db = sqlite3.connect('itdb.db')
 
+    i = 0
     with open('ranked-categories.tsv', 'r') as f:
         for line in f.read().splitlines():
-
-
-            category_name, importance = line.split('\t')
-            if importance == '-Infinity':
-                importance = -1.0
-            else:
-                importance = float(importance)
+            i += 1
+            try:
+                category_name, importance = line.split('\t')
+                if importance == '-Infinity':
+                    importance = -1.0
+                else:
+                    importance = float(importance)
+            except Exception as e:
+                print(e)
+                continue
 
             try:
-                print(f'Inserting {category_name}...')
+                print(f'[Row {i}] Inserting {category_name}...')
                 cursor = db.cursor()
                 cursor.execute('''INSERT INTO category(name, importance) VALUES (?, ?);''', [category_name, importance])
                 # Commit the change
@@ -24,19 +28,24 @@ def insert_categories():
                 # Roll back any change if something goes wrong
                 db.rollback()
                 print(e)
-
     db.close()
 
 def insert_articles():
     db = sqlite3.connect('itdb.db')
+    i = 0
     
     with open('page2cat.tsv', 'r') as f:
         for line in f.read().splitlines():
-            line_split = line.split('\t')
-            article_name, article_categories = line_split[0], line_split[1:]
+            i += 1
+            try:
+                line_split = line.split('\t')
+                article_name, article_categories = line_split[0], line_split[1:]
+            except Exception as e:
+                print(e)
+                continue
 
             try:
-                print(f'Inserting {article_name}...')
+                print(f'[Row {i}] Inserting {article_name}...')
                 cursor = db.cursor()
                 cursor.execute('''INSERT INTO article(title) VALUES (?);''', [article_name])
                 cursor.execute('''SELECT article_id FROM article WHERE title = ?;''', [article_name])
