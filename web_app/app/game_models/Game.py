@@ -153,6 +153,12 @@ class Game:
                 # TODO determine how many points they should get
                 player.update_score(1)
 
+    def submit_trivia_rank(self, rank):
+        # TODO
+        # 1. find current trivia TUnit
+        # 2. update TUnit in DB based on rank
+        print("trivia recieved rank", rank)
+
     def display_category_options(self) -> bool:
         """If applicable (depending on game mode), send a list of possible categories that a player can choose from to the front end, which will be displayed to the selected user.
 
