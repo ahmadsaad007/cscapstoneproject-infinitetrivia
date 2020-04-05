@@ -6,6 +6,7 @@ Gets contents and metadata from Wikipedia articles.
 """
 import json
 import random
+import re
 import time
 
 import requests
@@ -181,6 +182,8 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
     for tag in soup.findAll('p'):
         content += ''.join(tag.strings) + '\n'
 
+    content = remove_citations(content)
+
     categories = DBConn().select_article_categories(article_id)
     # Convert list of tuples to list of strings.
     categories = [category[0] for category in categories]
@@ -233,3 +236,13 @@ def convert_dms_to_decimal(dms_coord: str) -> float:
     except Exception as e:
         print(e, dms_coord)
         return None
+
+def remove_citations(content: str) -> str:
+    # Remove sentences that end with [citation needed]
+    while '[citation needed]' in content:
+        content = re.sub(r'\.([^.]*?\.)\[citation needed\]', '.', content)
+
+    # Remove citations and notes
+    content = re.sub(r' ?\[.*?\]', '', content)
+
+    return content

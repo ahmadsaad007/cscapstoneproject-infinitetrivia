@@ -204,31 +204,25 @@ class DBConn:
         INSERT INTO t_unit (
             article_id, 
             sentence, 
-            rank, 
             url, 
             access_timestamp,
             lat, 
             long, 
-            has_superlative, 
-            has_contrasting, 
-            root_word, 
-            subj_word, 
-            readability)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+            num_likes,
+            num_mehs,
+            num_dislikes)
+        VALUES (?,?,?,?,?,?,?,?,?)
         """
         cursor.execute(query, (
             tunit.article_id,
             tunit.sentence,
-            tunit.trivia_rank,
             tunit.url,
             tunit.access_timestamp,
             tunit.latitude,
             tunit.longitude,
-            tunit.has_superlative,
-            tunit.has_contrasting,
-            tunit.root_word,
-            tunit.subj_word,
-            tunit.readability
+            tunit.num_likes,
+            tunit.num_mehs,
+            tunit.num_dislikes
         ))
         db.commit()
         query = """
@@ -253,31 +247,24 @@ class DBConn:
         query = """
         UPDATE t_unit
         SET sentence = ?,
-            rank = ?,
             url = ?,
             access_timestamp = ?,
             lat = ?,
             long = ?,
-            has_superlative = ?,
-            has_contrasting = ?,
-            root_word = ?,
-            subj_word = ?,
-            readability = ?
+            num_likes = ?,
+            num_mehs = ?,
+            num_dislikes = ?
         WHERE t_unit_Id = ?
         """
         cursor.execute(query, (
             tunit.sentence,
-            tunit.trivia_rank,
             tunit.url,
             tunit.access_timestamp,
             tunit.latitude,
             tunit.longitude,
-            tunit.has_superlative,
-            tunit.has_contrasting,
-            tunit.root_word,
-            tunit.subj_word,
-            tunit.readability,
-            tunit.t_unit_id
+            tunit.num_likes,
+            tunit.num_mehs,
+            tunit.num_dislikes
         ))
         db.commit()
         db.close()
@@ -297,16 +284,13 @@ class DBConn:
             t_unit_Id,
             article_id,
             sentence,
-            rank,
             url,
             access_timestamp,
             lat,
             long,
-            has_superlative,
-            has_contrasting,
-            root_word,
-            subj_word,
-            readability
+            num_likes,
+            num_mehs,
+            num_dislikes
         FROM t_unit
         ORDER BY RANDOM() LIMIT 1;
         """
@@ -332,16 +316,13 @@ class DBConn:
             t_unit_Id,
             t.article_id,
             sentence,
-            rank,
             url,
             access_timestamp,
             lat,
             long,
-            has_superlative,
-            has_contrasting,
-            root_word,
-            subj_word,
-            readability
+            num_likes,
+            num_mehs,
+            num_dislikes
         FROM t_unit t
         JOIN article_category ac on t.article_id = ac.article_id
         JOIN category c on ac.category_id = c.category_id
@@ -350,34 +331,30 @@ class DBConn:
         cursor.execute(query, (category,))
         db_tunit = cursor.fetchone()
 
-        query = """
-        SELECT name
-        FROM category
-        JOIN article_category ac on category.category_id = ac.category_id
-        JOIN t_unit tu on ac.article_id = tu.article_id
-        WHERE tu.article_id = ?
-        """
-        cursor.execute(query, (db_tunit["article_id"],))
-        categories = []
-        for row in cursor.fetchall():
-            categories.append(row["name"])
+        # query = """
+        # SELECT name
+        # FROM category
+        # JOIN article_category ac on category.category_id = ac.category_id
+        # JOIN t_unit tu on ac.article_id = tu.article_id
+        # WHERE tu.article_id = ?
+        # """
+        # cursor.execute(query, (db_tunit["article_id"],))
+        # categories = []
+        # for row in cursor.fetchall():
+        #     categories.append(row["name"])
 
         db.close()
         return TUnit(
             db_tunit["sentence"],
             db_tunit["article_id"],
             db_tunit["url"],
-            categories,
             db_tunit["access_timestamp"],
-            db_tunit["has_superlative"],
-            db_tunit["has_contrasting"],
-            db_tunit["root_word"],
-            db_tunit["subj_word"],
-            db_tunit["readability"],
             db_tunit["t_unit_Id"],
             db_tunit["lat"],
             db_tunit["long"],
-            db_tunit["rank"]
+            db_tunit["num_likes"].
+            db_tunit["num_mehs"],
+            db_tunit["num_dislikes"]
         )
 
     def select_tunit_location(self, lat: float, long: float) -> list:
@@ -403,11 +380,9 @@ class DBConn:
             access_timestamp, 
             lat, 
             long, 
-            has_superlative, 
-            has_contrasting, 
-            root_word, 
-            subj_word, 
-            readability
+            num_likes,
+            num_mehs,
+            num_dislikes
         FROM t_unit
         WHERE lat > ? - 0.5 AND lat < ? + 0.5
         AND 
@@ -418,34 +393,30 @@ class DBConn:
         if db_tunit is None:
             return None
 
-        query = """
-        SELECT name
-        FROM category
-        JOIN article_category ac on category.category_id = ac.category_id
-        JOIN t_unit tu on ac.article_id = tu.article_id
-        WHERE tu.article_id = ?
-        """
-        cursor.execute(query, (db_tunit["article_id"],))
-        categories = []
-        for row in cursor.fetchall():
-            categories.append(row["name"])
+        # query = """
+        # SELECT name
+        # FROM category
+        # JOIN article_category ac on category.category_id = ac.category_id
+        # JOIN t_unit tu on ac.article_id = tu.article_id
+        # WHERE tu.article_id = ?
+        # """
+        # cursor.execute(query, (db_tunit["article_id"],))
+        # categories = []
+        # for row in cursor.fetchall():
+        #     categories.append(row["name"])
 
         db.close()
         return TUnit(
             db_tunit["sentence"],
             db_tunit["article_id"],
             db_tunit["url"],
-            categories,
             db_tunit["access_timestamp"],
-            db_tunit["has_superlative"],
-            db_tunit["has_contrasting"],
-            db_tunit["root_word"],
-            db_tunit["subj_word"],
-            db_tunit["readability"],
             db_tunit["t_unit_Id"],
             db_tunit["lat"],
             db_tunit["long"],
-            db_tunit["rank"]
+            db_tunit["num_likes"].
+            db_tunit["num_mehs"],
+            db_tunit["num_dislikes"]
         )
 
     def delete_tunit(self, tunit: TUnit):
