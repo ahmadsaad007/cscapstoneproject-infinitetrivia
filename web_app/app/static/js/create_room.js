@@ -1,6 +1,8 @@
 console.log("Create Room JS successfully loaded.");
 
 var socket = io.connect('http://' + document.domain + ":" + location.port);
+var round_wait = 5;
+var question_timer = 30;
 
 const pause = time => new Promise(resolve => setTimeout(resolve, time));
 var CODE; 
@@ -105,7 +107,7 @@ function display_score(data){
     console.log(counter_display);
     $('#room_container').append("<br><br>");
     $('#room_container').append(counter_display);
-    countdown(5).then(request_trivia);
+    countdown(round_wait).then(request_trivia);
 }
 
 function request_trivia(){
@@ -122,7 +124,7 @@ function present_trivia(trivia){
     $('#room_container').append("<br><br>");
     $('#room_container').append(time_board);
     prompt_response();
-    countdown(30).then(round_finish);
+    countdown(question_timer).then(round_finish);
 }
 
 function prompt_response(){
@@ -158,7 +160,7 @@ function display_answer(data){
         li += '</li>';
         $('#answer_list').append(li);
     }
-    countdown(5).then( function(){
+    countdown(round_wait).then( function(){
         socket.emit('request_scores', get_code(), function(data){
             display_score(data);
 	    });
