@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/question_page.css') }}">
+  <link rel="stylesheet" href="question_page.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+  
   <title>Infinite Questions</title>
 </head>
 <body>
@@ -26,10 +28,20 @@
         </div>
 	<button type="button" id="create_room_button">Create Room!</button>
       </div>
+      <div class="wrap">
+   
+        <a class="btn btn-medium btn-blue btn-radius" href="#">Player 1</a>
+        <a class="btn btn-medium btn-green btn-radius" href="#">Player 2</a>
+        <a class="btn btn-medium btn-orange  btn-radius" href="#">Player 3</a>
+        <a class="btn btn-medium btn-red btn-radius" href="#">Player 4</a>
+        
+       
+        
       
+      </div>
       <br>
   </div>
-
+    <script src="create_room.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/create_room.js') }}"></script>
 </body>
 </html>
