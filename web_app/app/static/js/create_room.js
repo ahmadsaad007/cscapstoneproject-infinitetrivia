@@ -27,8 +27,8 @@ function create_room(){
     $('#create_room_options').remove();
     // ask server to create game session
     socket.emit('create_game', game_options, function(val) {
-	add_lobby_html(val);
-	add_start_game_button();
+        add_lobby_html(val);
+        add_start_game_button();
     });
 }
 
@@ -40,10 +40,10 @@ function get_game_options(){
     var ele = $("input[name='game_mode']");
     var mode;
     for (i = 0; i < ele.length; i++){
-	if (ele[i].checked){
-	    mode = ele[i].value;
-	    break;
-	}
+        if (ele[i].checked){
+            mode = ele[i].value;
+            break;
+        }
     }
     game_opts.mode = mode;
 
@@ -79,11 +79,11 @@ function remove_player_from_lobby(name){
     console.log("name:", name);
     var ele = $("#player_list");
     for (i = 0; i < ele.length; i++){
-	console.log(ele[i].innerText);
-	if (ele[i].innerText === name){
-	    console.log("found it!");
-	    ele[i].remove();
-	}
+        console.log(ele[i].innerText);
+        if (ele[i].innerText === name){
+            console.log("found it!");
+            ele[i].remove();
+        }
     }
 }
 
@@ -98,9 +98,9 @@ function display_score(data){
     $('#room_container').append(title);
     $('#room_container').append(score_board);
     for (player of players){
-	console.log("name", player['name']);
-	console.log("score", player['score']);
-	$('#score_board').append('<li>' + player['name'] + " " +  player['score'] + '</li>');
+        console.log("name", player['name']);
+        console.log("score", player['score']);
+        $('#score_board').append('<li>' + player['name'] + " " +  player['score'] + '</li>');
     }
     console.log(counter_display);
     $('#room_container').append("<br><br>");
@@ -110,7 +110,7 @@ function display_score(data){
 
 function request_trivia(){
     socket.emit('request_trivia', get_code(), function(trivia){
-	present_trivia(trivia);
+	    present_trivia(trivia);
     });
 }
 
@@ -132,7 +132,7 @@ function prompt_response(){
 function round_finish(){
     socket.emit("answer_timeout", get_code());
     socket.emit("get_answers", get_code(), function(data){
-	display_answer(data);
+	    display_answer(data);
     });
 }
 
@@ -148,29 +148,34 @@ function display_answer(data){
     $('#room_container').append(responses);
     $('#room_container').append(answer_list);
     for (var player in data['player_answers']){
-	let li = '<li>' + player + ': ';
-	li += data['player_answers'][player]['answer'];
-	if (data['player_answers'][player]['correct']){
-	    li += ' (Correct)';
-	} else {
-	    li += ' (Incorrect)';
-	}
-	li += '</li>';
-	$('#answer_list').append(li);
+	    let li = '<li>' + player + ': ';
+	    li += data['player_answers'][player]['answer'];
+	    if (data['player_answers'][player]['correct']){
+	        li += ' (Correct)';
+        } else {
+            li += ' (Incorrect)';
+        }
+        li += '</li>';
+        $('#answer_list').append(li);
     }
     countdown(5).then( function(){
-	socket.emit('request_scores', get_code(), function(data){
-	    display_score(data);
-	});
+        socket.emit('request_scores', get_code(), function(data){
+            display_score(data);
+	    });
     });
 }
 
 async function countdown(seconds){
     let counter = seconds;
+    console.log("countdown starting");
+    socket.on('all_players_in', function(){
+        counter=0;
+        console.log("countdown now zero");
+    });
     while (counter > 0){
-	await pause(1000);
-	counter--;
-	$('#count_number').text(counter.toString());
+	    await pause(1000);
+	    counter--;
+	    $('#count_number').text(counter.toString());
     }
 }
 

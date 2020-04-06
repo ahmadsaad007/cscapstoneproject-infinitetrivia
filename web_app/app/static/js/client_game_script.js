@@ -139,15 +139,21 @@ function submit_text_answer(){
     console.log(answer);
     // TODO: send answer over to server
     socket.emit('submit_answer', {code: code, answer: answer}, function(status){
-	submitted_answer(status);
+	    submitted_answer(status);
     });
     // remove answer area
 }
 
 function submitted_answer(status){
-    if (status){
-	display_trivia_rank_prompt();
+    console.log("Submitted and returned");
+    console.log(status);
+    if (status[0]){
+        display_trivia_rank_prompt();
+        if (status[1]) {
+            console.log("All players in");
+            socket.emit('all_players_in');
+        }
     } else {
-	console.log("failed to submit answer!");
+	    console.log("failed to submit answer!");
     }
 }

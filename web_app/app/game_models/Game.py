@@ -112,20 +112,24 @@ class Game:
         self.current_answer = trivia_answer
         return trivia_question
 
-    def submit_answer(self, data: dict) -> bool:
+    def submit_answer(self, data: dict) -> list:
         """Retrives an answer the current trivia question from a given player.
 
-        :returns: True if answer was successfully submitted, False otherwise
+        :returns: A list, the first values corresponding the the success of submitting
+            the answer, true if successful, false otherwise,
+            the second value is true if there are no players left to answer, false if there are
+        
         """
+        print("Game submission:", data)
         player = self.get_player_by_sid(data['sid'])
         if player is None:
-            return False
+            return [False, False]
         else:
             player.current_answer = data['answer']
             self.number_of_responses += 1
             if self.number_of_responses == self.num_players:
-                pass  # TODO (probably check in socket code)
-            return True
+                return [True, True]
+            return [True, False]
 
     def get_trivia_answer_and_responses(self) -> dict:
         """Returns the answer to the current trivia, and the responses of each player
@@ -144,6 +148,7 @@ class Game:
             player.current_answer = ""
         self.round_number += 1
         self.update_scores(data)
+        self.number_of_responses = 0
         return data
 
     def update_scores(self, data):
