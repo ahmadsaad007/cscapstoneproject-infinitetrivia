@@ -182,7 +182,7 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
     for tag in soup.findAll('p'):
         content += ''.join(tag.strings) + '\n'
 
-    content = remove_citations(content)
+    content = preprocess_text(content)
 
     categories = DBConn().select_article_categories(article_id)
     # Convert list of tuples to list of strings.
@@ -237,12 +237,15 @@ def convert_dms_to_decimal(dms_coord: str) -> float:
         print(e, dms_coord)
         return None
 
-def remove_citations(content: str) -> str:
-    # Remove sentences that end with [citation needed]
+def preprocess_text(content: str) -> str:
+    # Remove sentences that end with [citation needed].
     while '[citation needed]' in content:
         content = re.sub(r'\.([^.]*?\.)\[citation needed\]', '.', content)
 
-    # Remove citations and notes
+    # Remove citations and notes.
     content = re.sub(r' ?\[.*?\]', '', content)
+
+    # Remove content in parentheses.
+    content = re.sub(r' ?\(.*?\)', '', content)
 
     return content

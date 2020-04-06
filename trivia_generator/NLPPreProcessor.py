@@ -32,20 +32,21 @@ def create_TUnits(article: Article) -> list:
     doc = nlp(paragraphs)
 
     for sent in list(doc.sents):
-        tunits.append(
-            TUnit(
-                sent.string,
-                article.article_id,
-                article.url,
-                article.access_timestamp,
-                None,
-                article.latitude,
-                article.longitude,
-                0,
-                0,
-                0
+        if features.is_complete_sentence(sent) and features.sentence_has_context(sent):
+            tunits.append(
+                TUnit(
+                    sent.string,
+                    article.article_id,
+                    article.url,
+                    article.access_timestamp,
+                    None,
+                    article.latitude,
+                    article.longitude,
+                    0,
+                    0,
+                    0
+                )
             )
-        )
 
     return tunits
 

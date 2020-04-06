@@ -13,11 +13,11 @@ def test_get_has_superlatives():
         ("I like most pies.", 1),
         ("I like the most pies.", 1)
     ]
-    for sentence_str, result in test_suite:
+    for sentence_str, expected in test_suite:
         sentence = nlp(sentence_str.lower())
-        has_superlatives = features.get_has_superlatives(sentence)
+        result = features.get_has_superlatives(sentence)
         print(sentence_str)
-        assert result == has_superlatives
+        assert expected == result
 
 def test_get_has_contradictatory():
     test_suite = [
@@ -29,11 +29,11 @@ def test_get_has_contradictatory():
         ("He holds contrary viewpoints.", 0)
     ]
 
-    for sentence_str, result in test_suite:
+    for sentence_str, expected in test_suite:
         sentence = list(nlp(sentence_str.lower()).sents)[0]
-        has_contradictatory = features.get_has_contradictatory(sentence)
+        result = features.get_has_contradictatory(sentence)
         print(sentence_str)
-        assert result == has_contradictatory
+        assert expected == result
 
 def test_get_fog_score():
     test_suite = [
@@ -46,8 +46,50 @@ def test_get_fog_score():
 
     ]
 
-    for sentence_str, result in test_suite:
+    for sentence_str, expected in test_suite:
         sentence = nlp(sentence_str.lower())
-        fog_score = round(features.get_fog_score(sentence), 3)
+        result = round(features.get_fog_score(sentence), 3)
         print(sentence_str)
-        assert result == fog_score
+        assert expected == result
+
+def test_is_complete_sentence():
+    test_suite = [
+        ("I eat an apple.", True),
+        ("Eat an apple.", False),
+        ("I eat.", False),
+        ("Eat an apple.", False),
+        ("During his childhood, Downey had minor roles in his father's films.", True),
+        ("In April 2001, while he was on parole", False),
+        ("In 2006, Downey returned to television when he did voice acting on Family Guy in the episode \"The Fat Guy Strangler\".", True),
+        ("Main articles: Robert Downey Jr. filmography and List of awards and nominations received by Robert Downey Jr.", False),
+        ("John may also refer to: ", False),
+        ("Third Epistle of John, often shortened to 3 John", False),
+        ("10 May 1758) was a German academic, librarian and lexicographer.", False)
+    ]
+
+    for sentence_str, expected in test_suite:
+        sentence = nlp(sentence_str.lower())
+        print(sentence_str)
+        result = features.is_complete_sentence(sentence)
+        assert expected == result
+
+def test_sentence_has_context():
+    test_suite = [
+        ("I eat an apple.", False),
+        ("Eat an apple.", False),
+        ("I eat.", False),
+        ("Eat an apple.", False),
+        ("During his childhood, Downey had minor roles in his father's films.", True),
+        ("In April 2001, while he was on parole", False),
+        ("In 2006, Downey returned to television when he did voice acting on Family Guy in the episode \"The Fat Guy Strangler\".", True),
+        ("Main articles: Robert Downey Jr. filmography and List of awards and nominations received by Robert Downey Jr.", False),
+        ("John may also refer to: ", True),
+        ("Third Epistle of John, often shortened to 3 John", True),
+        ("10 May 1758) was a German academic, librarian and lexicographer.", False)
+    ]
+
+    for sentence_str, expected in test_suite:
+        sentence = nlp(sentence_str.lower())
+        print(sentence_str)
+        result = features.sentence_has_context(sentence)
+        assert expected == result
