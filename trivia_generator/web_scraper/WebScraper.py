@@ -50,12 +50,12 @@ def get_page_by_random() -> Article:
     page_html = None
     url = None
     while page_html is None:
-        article_id, title = DBConn().select_random_article()
+        article_id, title, importance = DBConn().select_weighted_random_article()
         url = BASE_URL + title.replace(' ', '_')
         page_html = _get_page_from_title(title)
     access_timestamp = int(time.time())
 
-    article = _get_article_features(page_html, url, access_timestamp, article_id)
+    article = _get_article_features(page_html, url, access_timestamp, article_id, importance)
     return article
 
 # TODO change to make sure articles are in database.
@@ -164,7 +164,7 @@ def _get_page_and_url(url: str) -> (str, str):
         return None, None
     return page_html, req.url
 
-def _get_article_features(page_html: str, url: str, access_timestamp: int, article_id: int = 1) -> Article:
+def _get_article_features(page_html: str, url: str, access_timestamp: int, article_id: int = 1, importance: float = -1) -> Article:
     """Parses the features of Article from the page html.
 
     :param page_html: the HTML of the page.
@@ -184,11 +184,11 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
 
     content = preprocess_text(content)
 
-    categories = DBConn().select_article_categories(article_id)
-    # Convert list of tuples to list of strings.
-    categories = [category[0] for category in categories]
-
     # Get categories from original Wikipedia article.
+    # categories = DBConn().select_article_categories(article_id)
+
+    # Convert list of tuples to list of strings.
+    # categories = [category[0] for category in categories]
     # categories_div = soup.find('div', {'id': 'mw-normal-catlinks'})
     # if categories_div.ul.children:
     #     for li in categories_div.ul.children:
@@ -204,7 +204,7 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
         longitude = None
         latitude = None
     
-    article = Article(content, url, article_id, categories, access_timestamp, latitude, longitude)
+    article = Article(content, url, article_id, importance, access_timestamp, latitude, longitude)
     return article
 
 

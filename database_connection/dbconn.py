@@ -3,6 +3,7 @@ Database Connection
 ===================
 """
 from dataclasses import dataclass
+import random
 import sqlite3
 
 from trivia_generator import TUnit
@@ -30,6 +31,7 @@ class DBConn:
 
     DB_CONFIG_FILE: str = "database_connection/db.cfg"
     db_filename: str = None
+    max_importance: float = None
 
     def __init__(self):
         with open(DBConn.DB_CONFIG_FILE, "r") as file:
@@ -42,6 +44,18 @@ class DBConn:
             d[col[0]] = row[idx]
         return d
 
+    def select_max_importance(self) -> float:
+        """Gets the max importance score of the category with the maximum importance score, if not yet recorded.
+        """
+        if self.max_importance is None:
+            db = sqlite3.connect(self.db_filename)
+            cursor = db.cursor()
+            cursor.execute('SELECT MAX(importance) FROM category;')
+            row = cursor.fetchone()
+            self.max_importance = row[0]
+            db.close()
+        return self.max_importance   
+
     def select_random_article(self) -> tuple:
         """Selects a random article from the database.
 
@@ -53,6 +67,54 @@ class DBConn:
         article_id, title = cursor.fetchone()
         db.close()
         return article_id, title
+
+    def select_weighted_random_article(self) -> tuple:
+        """Selects a random article from the database weighted by its importance score.
+
+        returns: the article id and title of the random article.
+        """
+        db = sqlite3.connect(self.db_filename)
+        cursor = db.cursor()
+        
+        min_select_importance = random.random() * self.select_max_importance()
+
+        query = """
+        SELECT article.article_id, article.title, SUM(importance) AS article_importance
+        FROM article_category
+            JOIN article ON article.article_id = article_category.article_id
+            JOIN category ON category.category_id = article_category.category_id
+        GROUP BY article.article_id
+        HAVING SUM(importance) > ?
+        ORDER BY RANDOM()
+        LIMIT 1;
+        """
+
+        cursor.execute(query, [min_select_importance])
+        article_id, title, importance = cursor.fetchone()
+        db.close()
+        return article_id, title, importance
+
+    def select_random_category(self) -> tuple:
+        """Selects a random category from the database weighted by its importance score.
+
+        returns: the category id, name, and importance of the category.
+        """
+
+        db = sqlite3.connect(self.db_filename)
+        cursor = db.cursor()
+        min_select_importance = random.random() * self.select_max_importance()
+
+        # Get a random category whose importace score is above min_select_importance
+        query = """
+        SELECT category_id, name, importance
+        FROM category
+        WHERE importance >= ?
+        ORDER BY RANDOM()
+        LIMIT 1;"""
+        cursor.execute(query, [min_select_importance])
+        row = cursor.fetchone()
+        db.close()
+        return row
 
     def select_article_categories(self, article_id: int) -> list:
         """Selects the categories associated with the article with the given article id.
@@ -581,7 +643,7 @@ class DBConn:
         db.row_factory = self.__dict_factory
         cursor = db.cursor()
         query = """
-        SELECT article_id, title
+        SELECT article.article_id, title
         FROM article
         JOIN t_unit tu on article.article_id = tu.article_id
         WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5 AND
