@@ -63,5 +63,5 @@ def test_remove_citations():
     ]
 
     for original, expected in original_expected_texts:
-        processed_text = remove_citations(original)
+        processed_text = preprocess_text(original)
         assert processed_text == expected
