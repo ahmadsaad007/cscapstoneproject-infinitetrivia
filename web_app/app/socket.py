@@ -98,6 +98,10 @@ def submit_answer(data):
     data['sid'] = request.sid
     return games[code].submit_answer(data)
 
+@socketio.on('all_players_in')
+def cancel_timer():
+    socketio.emit('all_players_in')
+
 
 @socketio.on('answer_timeout')
 def answer_timeout(code):

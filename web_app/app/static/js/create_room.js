@@ -167,9 +167,6 @@ function display_answer(data){
     });
 }
 
-
-
-
 async function countdown(seconds){
     let counter = seconds;
     console.log("countdown starting");
@@ -178,9 +175,9 @@ async function countdown(seconds){
         counter=0;
         console.log("countdown now zero");
     });
-    while (counter > 0){
+    while (counter-- > 0){
 	    await pause(1000);
-	    counter--;
+	    //counter--;
 	    $('#count_number').text(counter.toString());
     }
 }
