@@ -4,10 +4,17 @@ from flask_login import login_required, current_user
 
 main = Blueprint('main', __name__)
 
+'''
+In routes already
+'''
 @main.route('/')
 def index():
     return render_template('index.html')
 
+
+'''
+Copied to routes
+'''
 @main.route('/profile')
 @login_required
 def profile():

@@ -3,13 +3,19 @@ from . import db
 
 auth = Blueprint('auth', __name__)
 
+'''
+Exists but maybe keep for now
+'''
 @auth.route('/login')
 def login():
     return render_template('login.html')
 
-@auth.route('/signup')
-def signup():
-    return render_template('signup.html')
+'''
+dynamically generated
+'''
+#@auth.route('/signup')
+#def signup():
+#    return render_template('signup.html')
 
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,6 +23,16 @@ from flask_login import login_user, logout_user, login_required
 from .models import User
 from . import db
 ...
+
+''' Maybe necessary
+@auth.route('/login', methods=['POST'])
+def login_handler():
+    if request.form.get("email"):
+        return signup_post(request)
+    else:
+        return login_post(request)
+'''
+
 @auth.route('/signup', methods=['POST'])
 def signup_post():
     email = request.form.get('email')
@@ -54,7 +70,7 @@ def login_post():
 
     # if the above check passes, then we know the user has the right credentials
     login_user(user, remember=remember)
-    return redirect(url_for('main.profile'))
+    return redirect(url_for('/'))
 
 @auth.route('/logout')
 @login_required

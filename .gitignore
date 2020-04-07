@@ -145,3 +145,6 @@ itdb.db
 # Emacs
 *~
 *#
+
+# VS Code
+.vscode
