@@ -9,7 +9,7 @@ def trivia_classifier():
     Trains an SVM classifier with a linear kernel and then tests it
     """
     # Read the training data file
-    szDatasetPath = 'input.csv'
+    szDatasetPath = 'training_data.csv'
     listClasses = []
     listAttrs = []
     bFirstRow = True
@@ -20,10 +20,10 @@ def trivia_classifier():
                 bFirstRow = False
                 continue
             listClasses.append(row[-1])
-            listAttrs.append(list(map(float, row[3:6])))
+            listAttrs.append(list(map(float, row[1:4])))
     """Added a column of 1's to the data"""
-    for i in range(len(listAttrs)):
-        listAttrs[i].append(1.0)
+    #for i in range(len(listAttrs)):
+    #    listAttrs[i].append(1.0)
     dataX = np.array(listAttrs)
     dataY = np.array(listClasses)
     
