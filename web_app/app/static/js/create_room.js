@@ -167,10 +167,14 @@ function display_answer(data){
     });
 }
 
+
+
+
 async function countdown(seconds){
     let counter = seconds;
     console.log("countdown starting");
     socket.on('all_players_in', function(){
+        console.log("countdown now zero");
         counter=0;
         console.log("countdown now zero");
     });
