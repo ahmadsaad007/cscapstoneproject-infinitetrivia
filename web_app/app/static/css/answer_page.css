@@ -20,7 +20,9 @@ body {
   a {
       color: #2A679F;
   }
-  /*========*/
+  /*========
+    terrible
+   */
   
   .form-wrapper {
       background-color: #f6f6f6;
@@ -208,3 +210,71 @@ h2 {
   clear: both;
 }
 
+#dislike_button {
+	cursor:pointer;
+	width:33%;
+	border:none;
+	background:#F00;
+	color:#000;
+	margin:0 0 5px;
+	padding:10px;
+	font-size:15px;
+	float: left;
+ 	padding-top: 8px;
+	height: 35px;
+	border-radius: 20px;
+	margin-top: 15px;
+}
+
+#meh_button {
+	cursor:pointer;
+	width:33%;
+	border:none;
+	background:#FF0;
+	color:#000;
+	margin:0 0 5px;
+	padding:10px;
+	font-size:15px;
+	float: left;
+ 	padding-top: 8px;
+	height: 35px;
+	border-radius: 20px;
+	margin-top: 15px;
+}
+
+#like_button {
+	cursor:pointer;
+	width:33%;
+	border:none;
+	background:#0F0;
+	color:#000;
+	margin:0 0 5px;
+	padding:10px;
+	font-size:15px;
+	float: left;
+ 	padding-top: 8px;
+	height: 35px;
+	border-radius: 20px;
+	margin-top: 15px;
+}
+
+#like_button:hover {
+	background:#0F4;
+	-webkit-transition:background 0.3s ease-in-out;
+	-moz-transition:background 0.3s ease-in-out;
+	transition:background-color 0.3s ease-in-out;
+}
+
+#dislike_button:hover {
+	background:#F04;
+	-webkit-transition:background 0.3s ease-in-out;
+	-moz-transition:background 0.3s ease-in-out;
+	transition:background-color 0.3s ease-in-out;
+}
+
+#meh_button:hover {
+	background:#FF4;
+	-webkit-transition:background 0.3s ease-in-out;
+	-moz-transition:background 0.3s ease-in-out;
+	transition:background-color 0.3s ease-in-out;
+}
