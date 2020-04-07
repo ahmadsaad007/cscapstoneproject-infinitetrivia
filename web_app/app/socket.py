@@ -93,14 +93,14 @@ def prompt_response(code):
 @socketio.on('submit_answer')
 def submit_answer(data):
     code = data['code']
-    # TODO validate answer
+    game = games[code]
     print("got answer:", data['answer'])
     data['sid'] = request.sid
-    return games[code].submit_answer(data)
-
-@socketio.on('all_players_in')
-def cancel_timer():
-    socketio.emit('all_players_in')
+    return_val = game.submit_answer(data)
+    if return_val[1] is True:
+        print('all players are in')
+        socketio.emit('all_players_in', room=game.host_id)
+    return return_val[0]
 
 
 @socketio.on('answer_timeout')
@@ -113,6 +113,8 @@ def get_answers(code):
     print("got request for trivia answers")
     game = games[code]
     data = game.get_trivia_answer_and_responses()
+    # prompt users for trivia rank once answer is displayed
+    socketio.emit('prompt_trivia_rank', room=code)
     return data
 
 

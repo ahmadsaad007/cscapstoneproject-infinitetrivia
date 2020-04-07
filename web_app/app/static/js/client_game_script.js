@@ -8,6 +8,7 @@ socket.on('display_splash_screen', function(round_number){
 });
 socket.on('display_text_response_prompt', display_text_response_prompt);
 socket.on('answer_timeout', display_timeout_message);
+socket.on('prompt_trivia_rank', display_trivia_rank_prompt);
 
 var code = undefined;
 
@@ -51,28 +52,28 @@ function join_game(){
 
 
 function display_game_code_error(){
-  console.log("invalid game code.");
-  error_div = $( '#code_error_container' );
-  error_div.empty();
-  error_div.append("Invalid Code!");
-  $( '#room_code' ).val("");
+    console.log("invalid game code.");
+    error_div = $( '#code_error_container' );
+    error_div.empty();
+    error_div.append("Invalid Code!");
+    $( '#room_code' ).val("");
 };
 
 
 function display_game_name_error(){
-  console.log("invalid name.");
-  error_div = $( '#name_error_container' );
-  error_div.empty();
-  error_div.append("Invalid Name!");
-  $( '#game_name' ).val("");
+    console.log("invalid name.");
+    error_div = $( '#name_error_container' );
+    error_div.empty();
+    error_div.append("Invalid Name!");
+    $( '#game_name' ).val("");
 };
 
 
 function display_join_error(){
     console.log("could not join game.");
-  error_div = $( '#name_error_container' );
-  error_div.empty();
-  error_div.append("Could Not Join Game!");
+    error_div = $( '#name_error_container' );
+    error_div.empty();
+    error_div.append("Could Not Join Game!");
 }
 
 
@@ -96,10 +97,16 @@ function display_text_response_prompt(){
     // $('#game_container').append(prompt);
     // $('#game_container').append(submit);
     // // connect button to submit event
-    const html = '<div class="form-style-6"><h1>Enter your answer here</h1><form class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here" required><input type="button" id="submit"></form></div>';
+    const html = '<h1>Enter your answer here</h1><div class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here"><input type="button" id="submit"></div>';
     $('#game_container').empty();
     $('#game_container').append(html);
     $('#submit').on('click', submit_text_answer);
+    $('#answer').keypress(event => {
+	var keycode = (event.keyCode ? event.keyCode : event.which);
+	if (keycode == '13'){ // enter button pressed
+	    submit_text_answer();
+	}
+    });
 }
 
 function display_timeout_message(){
@@ -111,7 +118,7 @@ function display_timeout_message(){
 }
 
 function display_trivia_rank_prompt(){
-    const prompt = '<h3>Submitted Response!</h3><h3>What Did you think of this trivia?</h3>';
+    const prompt = '<h3>What did you think of this trivia?</h3>';
     const dislike = '<button name="dislike" type="button" id="dislike_button">Dislike (1)</button>';
     const meh = '<button name="meh" type="button" id="meh_button">Meh (2)</button>';
     const like = '<button name="like" type="button" id="like_button">Like (3)</button>';
@@ -120,13 +127,11 @@ function display_trivia_rank_prompt(){
     $('#dislike_button').on('click', () => submit_trivia_rank('dislike'));
     $('#meh_button').on('click', () => submit_trivia_rank('meh'));
     $('#like_button').on('click', () => submit_trivia_rank('like'));
-    console.log("connected buttons");
 }
 
 function submit_trivia_rank(rank){
     console.log('submitted rank: ' + rank);
     socket.emit('submit_trivia_rank', {code: code, rank:rank}, function(status){
-	console.log("submit trivia callback");
 	if ( $('#round_number').length == 0 ){
 	    $('#game_container').empty();
 	    $('#game_container').append('<h3>Submitted Response!</h3>');
@@ -139,7 +144,7 @@ function submit_text_answer(){
     console.log(answer);
     // TODO: send answer over to server
     socket.emit('submit_answer', {code: code, answer: answer}, function(status){
-	    submitted_answer(status);
+	submitted_answer(status);
     });
     // remove answer area
 }
@@ -147,13 +152,10 @@ function submit_text_answer(){
 function submitted_answer(status){
     console.log("Submitted and returned");
     console.log(status);
-    if (status[0]){
-        display_trivia_rank_prompt();
-        if (status[1]) {
-            console.log("All players in");
-            socket.emit('all_players_in');
-        }
+    if (status){
+        $('#game_container').empty();
+	$('#game_container').append('<h3>Submitted Response!</h3>');
     } else {
-	    console.log("failed to submit answer!");
+	console.log("failed to submit answer!");
     }
 }
