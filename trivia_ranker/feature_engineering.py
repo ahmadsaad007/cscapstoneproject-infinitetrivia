@@ -53,7 +53,7 @@ def generate_training_data():
     tunits = NLPPreProcessor.get_TUnits(article)
     TUnit.tunit_list_to_tsv(tunits)
     
-    corpus_data = read_csv()
+    corpus_data = read_csv("tunits.tsv")
     sentence_list=[]
     for line in corpus_data:
         sentence_list.append(line[0].lower())
