@@ -1,6 +1,7 @@
 import itertools
 import spacy
 import csv
+import random
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nlp_helpers import features
@@ -12,9 +13,10 @@ from trivia_generator import TUnit
 
 nlp = NLPConn.get_nlp_conn()
 
+
 def get_unigram_features(sentences):
     
-    vectorizer = TfidfVectorizer(smooth_idf=True, use_idf=True, stop_words = "english", max_features = 1000)
+    vectorizer = TfidfVectorizer(smooth_idf=True, use_idf=True, stop_words = "english") #max_features = 1000
     X = vectorizer.fit_transform(sentences)
     
     df = pd.DataFrame(X.toarray(),columns = vectorizer.get_feature_names())
@@ -23,19 +25,21 @@ def get_unigram_features(sentences):
     idf_Sum = df['idf_Sum'].values.tolist()
     return idf_Sum
 
-def read_csv(fileName = "message.tsv"):
-    tsv_file = open(fileName)
-    read_tsv = csv.reader(tsv_file, delimiter="\t")
+def read_csv(fileName):
+    
     features_list = []
-    for row in read_tsv:
-        features = [row[0], row[7], row[8], row[9]]
-        features_list.append(features)
+    with open(fileName, 'r',newline = '', encoding='utf-8', errors='ignore') as file:
+        reader = csv.reader(file, delimiter='\t')
+        for row in reader:
+            features = [row[0], row[7], row[8], row[9]]
+            features_list.append(features)
     return features_list
 
 def generate_training_data():
+    
     article = WebScraper.get_page_by_random()
     tunits = NLPPreProcessor.get_TUnits(article)
-    TUnit.outputToTSV(tunits)
+    TUnit.tunit_list_to_tsv(tunits)
     
     corpus_data = read_csv()
     sentence_list=[]
@@ -60,7 +64,10 @@ def generate_training_data():
         mehs = int(line[2])
         dislikes = int(line[3])
         total_votes = likes + mehs + dislikes
-        value = (likes + 0.5*mehs)/total_votes)
+        if(total_votes == 0):
+            value = 0
+        else:
+            value = (likes + 0.5*mehs)/total_votes
         if(value < 0.33):
             label = 0
         elif(value > 0.67):
@@ -70,6 +77,9 @@ def generate_training_data():
         like_ratios.append(label)
     
     #write data to csv
+    rows = zip(sentence_list, uni_features, has_contra, has_super, fog, like_ratios)
+    
     with open('training_data.csv','w') as file:
         wr = csv.writer(file, dialect='excel', delimiter=',')
-        wr.writerows(zip(sentence_list, uni_features, has_contra, has_super, fog, like_ratios))
+        for row in rows:
+            wr.writerow(row)
