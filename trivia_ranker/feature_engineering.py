@@ -13,6 +13,18 @@ from trivia_generator import TUnit
 
 nlp = NLPConn.get_nlp_conn()
 
+def get_ner_counts(sentences):
+    ner_ratio = []
+    for sentence in sentences:
+        doc = nlp(sentence)
+        ner_counts = 0
+        for ent in doc.ents:
+            if(ent.label_ == "PERSON" or ent.label_ == "MONEY" or ent.label_ == "EVENT" or 
+                ent.label_ == "ORDINAL" or ent.label_ == "LANGUAGE" or ent.label_ == "WORK_OF_ART" 
+                or ent.label_ == "GPE" or ent.label_ == "LOC"):
+                ner_counts = ner_counts + 1
+        ner_ratio.append(ner_counts/len(doc))
+    return ner_ratio
 
 def get_unigram_features(sentences):
     
@@ -45,6 +57,9 @@ def generate_training_data():
     sentence_list=[]
     for line in corpus_data:
         sentence_list.append(line[0].lower())
+    #get ner_ratios/counts
+    ner_ratio = get_ner_counts(sentence_list)
+
     #get Unigram features
     uni_features = get_unigram_features(sentence_list)
     
@@ -77,9 +92,11 @@ def generate_training_data():
         like_ratios.append(label)
     
     #write data to csv
-    rows = zip(sentence_list, uni_features, has_contra, has_super, fog, like_ratios)
+    rows = zip(sentence_list, ner_ratio, uni_features, has_contra, has_super, fog, like_ratios)
     
     with open('training_data.csv','w') as file:
         wr = csv.writer(file, dialect='excel', delimiter=',')
         for row in rows:
             wr.writerow(row)
+
+generate_training_data()
