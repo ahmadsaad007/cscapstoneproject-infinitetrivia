@@ -13,34 +13,38 @@
 <body>
   <h1>Infinite Trivia</h1>
 
+  <h3></h3>
   <div id="room_container">
       <div id="create_room_options">
         <h2>Create A Room Here</h2>
         <div id="radio_buttons">
 
           <!-- Options -->
-          <input type="radio" id="fibbage" name="game_mode" value="fibbage">
-            <label for="fibbage">Fibbage</label><br>
-          <input type="radio" id="category" name="game_mode" value="category">
-            <label for="category">Category</label><br>
-          <input type="radio" id="random" name="game_mode" value="random">
-          <label for="random">Random</label> 
+          <label for="fibbage">
+            <input type="radio" value="fibbage" name="game_mode" id="fibbage"> <span>Fibbage</span>
+          </label>
+          <label for="category">
+          <input type="radio" value="category" name="game_mode" id="category"> <span>Category</span>
+        </label>
+          <label for="random">
+       <input type="radio" value="random"  name="game_mode" id="random" checked> <span>Random</span>
+        </label>
         </div>
-	<button type="button" id="create_room_button">Create Room!</button>
+	<button class="room" id="create_room_button">Create Room!</button>
       </div>
+      <!--
       <div class="wrap">
    
         <a class="btn btn-medium btn-blue btn-radius" href="#">Player 1</a>
         <a class="btn btn-medium btn-green btn-radius" href="#">Player 2</a>
         <a class="btn btn-medium btn-orange  btn-radius" href="#">Player 3</a>
         <a class="btn btn-medium btn-red btn-radius" href="#">Player 4</a>
-        
-       
-        
-      
+
       </div>
+      -->
       <br>
   </div>
+
     <script src="create_room.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/create_room.js') }}"></script>
 </body>

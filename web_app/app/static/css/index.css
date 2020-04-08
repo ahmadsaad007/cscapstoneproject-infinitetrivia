@@ -1,7 +1,21 @@
-html {
-    height: 100%;
-}
+@import url(https://fonts.googleapis.com/css?family=Shanti|Salsa);
 
+html {
+	background: radial-gradient(#b4c5cf, #447891);
+	background-attachment: fixed;
+  }
+  
+  body {
+	margin: 20px;
+	font: 24px/1 'Salsa', sans-serif;
+	color: #fff;
+	text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+  }
+  
+	
+	a {
+		color: #2A679F;
+	}
 a.button {
     -webkit-appearance: button;
     -moz-appearance: button;
@@ -12,7 +26,7 @@ a.button {
 }
 
 body {
-    background-color: #2F3035;
+  
  
     background-size: cover;
     background-repeat: no-repeat;
@@ -80,14 +94,6 @@ nav a {
 	text-rendering:optimizeLegibility;
 }
 
-body {
-	font-family:"Open Sans", Helvetica, Arial, sans-serif;
-	font-weight:300;
-	font-size: 12px;
-	line-height:30px;
-	color:#777;
-	background:#0CF;
-}
 
 .container {
 	max-width:400px;
@@ -191,3 +197,50 @@ fieldset {
 :-ms-input-placeholder {
  color:#888;
 }
+
+.room{
+	position: relative; 
+	top:20px;
+	background-color:radial-gradient(#b4c5cf, #447891);;
+	color: #fff;
+	width: 190px;
+	height: 35px;
+	cursor: pointer;
+	font-family: Arial, Tahoma, sans-serif;
+	font-size: 1.0em;
+	border-radius: 2px;
+	cursor: pointer;
+	font-family: Arial, Tahoma, sans-serif;
+	font-size: 1.0em;
+	font-weight: bold;
+	border-width: 1px;
+	border-color: #000;
+	background-image: -moz-linear-gradient(top#b4c5cf, #141a1d 100%);
+	background-image: -ms-linear-gradient(top,#b4c5cf,  #141a1d 100%);
+	background-image: -o-linear-gradient(top,#b4c5cf, #141a1d 100%);
+	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0,,#b4c5cf),color-stop(100%,   #141a1d));
+	background-image: -webkit-linear-gradient(top,#b4c5cf, #141a1d 100%);
+	background-image: linear-gradient(to bottom,#b4c5cf, #141a1d 100%);
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, .6);
+  -moz-box-shadow: inset 0 1px 0 rgba(256, 256, 256, .35);
+  -ms-box-shadow: inset 0 1px 0 rgba(256, 256, 256, .35);
+  -webkit-box-shadow: inset 0 1px 0 rgba(256, 256, 256, .35);
+  box-shadow: inset 0 1px 0 rgba(256, 256, 256, .35);
+  
+  }
+  
+	
+  .room:active {
+  border-color: #000 #002d59 #002d59;
+  -moz-box-shadow: inset 0 1px 3px rgba(0,0,0,0.2),0 1px 0 #fff;
+  -ms-box-shadow: inset 0 1px 3px rgba(0,0,0,0.2),0 1px 0 #fff;
+  -webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,0.2),0 1px 0 #fff;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2),0 1px 0 #fff;
+  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr=#005ab4,EndColorStr=#175ea6);
+  background-image: -moz-linear-gradient(top,#2c3136 0,#aeb3b9 100%);
+  background-image: -ms-linear-gradient(top,#2c3136 0,#aeb3b9 100%);
+  background-image: -o-linear-gradient(top,#2c3136 0,#aeb3b9 100%);
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0,#2c3136),color-stop(100%#aeb3b9));
+  background-image: -webkit-linear-gradient(top,#2c3136 0,#aeb3b9 100%);
+  background-image: linear-gradient(to bottom,#2c3136 0,#aeb3b9 100%);
+  }
