@@ -86,7 +86,7 @@ function display_splash_screen(round_number){
 
 function display_text_response_prompt(){
     const prompt = '<b>Answer:</b> <input id="text_answer">';
-    const submit = '<button type="button" id="submit">Submit!</button>';
+    const submit = '<button class="room" type="button" id="submit">Submit!</button>';
     $('#game_container').empty();
     $('#game_container').append(prompt);
     $('#game_container').append(submit);
