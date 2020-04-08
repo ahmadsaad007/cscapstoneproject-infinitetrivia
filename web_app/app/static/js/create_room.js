@@ -192,7 +192,7 @@ async function countdown(seconds){
 }
 
 function add_start_game_button(){
-    let btn = '<button type=button id="start_game_btn"> ' + "Start Game!" + "</button>";
+    let btn = '<button class="room" type=button id="start_game_btn"> ' + "Start Game!" + "</button>";
     $('#room_container').append(btn);
     $('#start_game_btn').on('click', start_game);
 }
