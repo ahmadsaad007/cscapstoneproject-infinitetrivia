@@ -188,33 +188,11 @@ class TestDBConn(unittest.TestCase):
 
     # TODO(Alex): test_update_tunit_exists()
     def test_update_tunit_exists(self):
-        exp_user = DBUser(username='Jack', email='jack@email.com', wins=8, losses=8, num_answered=16,
-                          num_answered_correct=8)
-        exp_password = 'pass2'
-        user_id = DBConn(TestDBConn.DB_FILENAME).update_user(exp_user)
-        query = '''
-        SELECT *
-        FROM user
-        WHERE user_id = ?
-        '''
-        conn = sqlite3.connect(TestDBConn.DB_FILENAME)
-        rows = conn.cursor().execute(query, (user_id,)).fetchall()
-        conn.close()
-        self.assertEqual(len(rows), 1)
-        row = rows[0]  # row: (1, 'Jim', 'jim@email', 'pass', 0, 0, 0, 0)
-        exp_user.user_id = row[0]
-        act_user = DBUser(user_id=row[0], username=row[1], email=row[2], wins=row[4], losses=row[5],
-                          num_answered=row[6], num_answered_correct=row[7])
-        act_password = row[3]
-        self.assertEqual(exp_user, act_user)
-        self.assertEqual(exp_password, act_password)
+        pass
 
     # TODO(Alex): test_update_tunit_does_not_exist()
     def test_update_tunit_does_not_exist(self):
-        user = DBUser(username='Jane', email='jane@email.com')
-        exp_user_id = -1
-        act_user_id = DBConn(TestDBConn.DB_FILENAME).update_user(user)
-        self.assertEqual(exp_user_id, act_user_id)
+        pass
 
     # TODO(Alex): test_select_tunit_random()
 
