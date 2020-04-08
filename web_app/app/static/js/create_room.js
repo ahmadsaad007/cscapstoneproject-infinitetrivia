@@ -3,6 +3,8 @@ console.log("Create Room JS successfully loaded.");
 var socket = io.connect('http://' + document.domain + ":" + location.port);
 var round_wait = 5;
 var question_timer = 30;
+var worker;
+var all_players_in_flag = false;
 
 const pause = time => new Promise(resolve => setTimeout(resolve, time));
 var CODE; 
@@ -19,6 +21,10 @@ socket.on('remove_player_from_lobby', (name) => {
     remove_player_from_lobby(name);
 });
 
+socket.on('all_players_in', () => {
+    console.log('all players in!');
+    all_players_in_flag = true;
+});
 
 function create_room(){
     let game_options = get_game_options();
@@ -104,7 +110,6 @@ function display_score(data){
         console.log("score", player['score']);
         $('#score_board').append('<li>' + player['name'] + " " +  player['score'] + '</li>');
     }
-    console.log(counter_display);
     $('#room_container').append("<br><br>");
     $('#room_container').append(counter_display);
     countdown(round_wait).then(request_trivia);
@@ -124,7 +129,20 @@ function present_trivia(trivia){
     $('#room_container').append("<br><br>");
     $('#room_container').append(time_board);
     prompt_response();
-    countdown(question_timer).then(round_finish);
+    //countdown(question_timer).then(round_finish);
+    worker = new Worker('static/js/timer.js');
+    console.log('created worker!');
+    if (worker == undefined){
+	console.log('worker creation failed');
+    }
+    worker.onmessage = function(event) {
+	$('#count_number').text(event.data.toString());
+	if (event.data == 0 || all_players_in_flag){
+	    worker.terminate();
+	    worker = undefined;
+	    round_finish();
+	}
+    };
 }
 
 function prompt_response(){
@@ -132,6 +150,7 @@ function prompt_response(){
 }
 
 function round_finish(){
+    all_players_in_flag = false;
     socket.emit("answer_timeout", get_code());
     socket.emit("get_answers", get_code(), function(data){
 	    display_answer(data);
@@ -139,8 +158,6 @@ function round_finish(){
 }
 
 function display_answer(data){
-    // TODO
-    console.log("got answer!");
     const trivia_answer = '<h3>Answer: ' + data['answer'] + '</h3>';
     const responses = '<h3>Responses:</h3>';
     const answer_list = '<ul id="answer_list"></ul>';
@@ -163,22 +180,14 @@ function display_answer(data){
     countdown(round_wait).then( function(){
         socket.emit('request_scores', get_code(), function(data){
             display_score(data);
-	    });
+	});
     });
 }
 
 async function countdown(seconds){
-    let counter = seconds;
-    console.log("countdown starting");
-    socket.on('all_players_in', function(){
-        console.log("countdown now zero");
-        counter=0;
-        console.log("countdown now zero");
-    });
-    while (counter-- > 0){
-	    await pause(1000);
-	    //counter--;
-	    $('#count_number').text(counter.toString());
+    while (seconds-- > 0){
+	await pause(1000);
+	$('#count_number').text(seconds.toString());
     }
 }
 

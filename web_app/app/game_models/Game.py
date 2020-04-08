@@ -102,12 +102,15 @@ class Game:
         :returns: a trivia question
         """
         quest_ans_pairs = []
-        while (not quest_ans_pairs):
+        print('searching for trivia!')
+        while not quest_ans_pairs:
             trivia_article = get_page_by_random()
             tunit_list = create_TUnits(trivia_article)
-            tunit = random.choice(tunit_list)
-            quest_ans_pairs = nlp_question_generation(tunit.sentence)
+            if tunit_list:
+                tunit = random.choice(tunit_list)
+                quest_ans_pairs = nlp_question_generation(tunit.sentence)
         trivia_question, trivia_answer = random.choice(quest_ans_pairs)
+        print('found trivia!')
         self.current_trivia = trivia_question
         self.current_answer = trivia_answer
         return trivia_question
@@ -127,6 +130,8 @@ class Game:
         else:
             player.current_answer = data['answer']
             self.number_of_responses += 1
+            print('number of responses:', self.number_of_responses)
+            print('number of players:', self.num_players)
             if self.number_of_responses == self.num_players:
                 return [True, True]
             return [True, False]
