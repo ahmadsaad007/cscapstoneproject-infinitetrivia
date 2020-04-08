@@ -110,3 +110,11 @@ def get_answers(code):
     game = games[code]
     data = game.get_trivia_answer_and_responses()
     return data
+
+
+@socketio.on('submit_trivia_rank')
+def submit_trivia_rank(data):
+    code = data['code']
+    game = games[code]
+    game.submit_trivia_rank(data['rank'])
+    return True

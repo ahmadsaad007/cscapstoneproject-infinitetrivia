@@ -42,3 +42,35 @@ def count_syllables(word) -> int:
     if syllable_count == 0:
         syllable_count += 1
     return syllable_count
+
+def is_complete_sentence(sentence) -> bool:
+    # If sentence begins with a capital letter and ends with punctuation.
+    if sentence[-1].is_punct:
+        num_nouns = len([tok for tok in sentence if tok.pos_ in ["NOUN", "PROPN", "PRON"]])
+        num_verbs = len([tok for tok in sentence if tok.pos_ == "VERB"])
+
+        if type(sentence) == spacy.tokens.Span:
+            root_word = sentence.root
+        else:
+            root_word = list(sentence.sents)[0].root
+
+        # Complete sentence has subject (noun), verb, and object (noun).
+        # The verb should be the root of the sentence.
+        return num_nouns >= 2 and num_verbs >= 1 and root_word.pos_ == "VERB"
+    else:
+        return False
+
+def sentence_has_context(sentence) -> bool:
+    if type(sentence) == spacy.tokens.Span:
+        nlp = NLPConn.get_nlp_conn()
+        sentence = nlp(sentence.string)
+    
+    sent_subjs = [t for t in sentence if t.dep_ == 'nsubj']
+    return any([subj for subj in sent_subjs if subj.pos_ == "PROPN"])
+
+def resolve_coreferences(content: str) -> str:
+    nlp = NLPConn.get_nlp_conn()
+    doc = nlp(content)
+    resolved_coref = doc._.coref_resolved
+    print(resolved_coref)
+    return resolved_coref
