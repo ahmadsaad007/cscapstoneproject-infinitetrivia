@@ -9,10 +9,12 @@ import sqlite3
 from trivia_generator import TUnit
 from typing import List
 from trivia_generator.web_scraper import Article
+from flask_login import UserMixin
+
 
 
 @dataclass
-class DBUser:
+class DBUser(UserMixin):
     user_id: int = None
     username: str = None
     email: str = None
