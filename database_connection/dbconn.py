@@ -6,9 +6,8 @@ from dataclasses import dataclass
 import random
 import sqlite3
 
-from trivia_generator import TUnit
-from typing import List, Optional
-from trivia_generator.web_scraper import Article
+from trivia_generator.TUnit import TUnit
+from typing import Optional
 
 
 @dataclass
@@ -22,10 +21,7 @@ class DBUser:
     num_answered_correct: int = 0
 
     def __eq__(self, other):
-        for variable in self.__dict__.keys():
-            if self.__dict__[variable] != other.__dict__[variable]:
-                return False
-        return True
+        return self.__dict__ == other.__dict__
 
 
 @dataclass
@@ -34,7 +30,7 @@ class DBConn:
     Class representing a database connection.
     """
 
-    DB_CONFIG_FILE: str = "db.cfg"
+    DB_CONFIG_FILE: str = "database_connection/db.cfg"
     db_filename: str = None
     max_importance: float = None
 
@@ -44,13 +40,6 @@ class DBConn:
                 self.db_filename = file.read().split("=")[1]
         else:
             self.db_filename = filename
-
-    @staticmethod
-    def __dict_factory(cursor, row):
-        d = {}
-        for idx, col in enumerate(cursor.description):
-            d[col[0]] = row[idx]
-        return d
 
     def select_max_importance(self) -> float:
         """Gets the max importance score of the category with the maximum importance score, if not yet recorded.
@@ -62,12 +51,13 @@ class DBConn:
             row = cursor.fetchone()
             self.max_importance = row[0]
             db.close()
-        return self.max_importance   
+        return self.max_importance
 
     def select_random_article(self) -> tuple:
         """Selects a random article from the database.
 
         returns: the article id and title of the random article.
+        rtype: (int, str)
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
@@ -80,22 +70,23 @@ class DBConn:
         """Selects a random article from the database weighted by its importance score.
 
         returns: the article id and title of the random article.
+        rtype: (int, str)
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
-        
+
         min_select_importance = random.random() * self.select_max_importance()
 
         query = """
-        SELECT article.article_id, article.title, SUM(importance) AS article_importance
-        FROM article_category
-            JOIN article ON article.article_id = article_category.article_id
-            JOIN category ON category.category_id = article_category.category_id
-        GROUP BY article.article_id
-        HAVING SUM(importance) > ?
-        ORDER BY RANDOM()
-        LIMIT 1;
-        """
+                SELECT article.article_id, article.title, SUM(importance) AS article_importance
+                FROM article_category
+                    JOIN article ON article.article_id = article_category.article_id
+                    JOIN category ON category.category_id = article_category.category_id
+                GROUP BY article.article_id
+                HAVING SUM(importance) > ?
+                ORDER BY RANDOM()
+                LIMIT 1;
+                """
 
         cursor.execute(query, [min_select_importance])
         article_id, title, importance = cursor.fetchone()
@@ -114,11 +105,11 @@ class DBConn:
 
         # Get a random category whose importace score is above min_select_importance
         query = """
-        SELECT category_id, name, importance
-        FROM category
-        WHERE importance >= ?
-        ORDER BY RANDOM()
-        LIMIT 1;"""
+                SELECT category_id, name, importance
+                FROM category
+                WHERE importance >= ?
+                ORDER BY RANDOM()
+                LIMIT 1;"""
         cursor.execute(query, [min_select_importance])
         row = cursor.fetchone()
         db.close()
@@ -129,16 +120,18 @@ class DBConn:
 
         :param article_id: The ID of the article.
         :type article_id: int
+        :raises: sqlite3.DatabaseError
         :returns: the list of strings representing the names of the categories.
+        :rtype: [str]
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        SELECT name
-        FROM article_category
-            JOIN category ON article_category.category_id = category.category_id
-        WHERE article_id = ?;
-        """
+                SELECT name
+                FROM article_category
+                    JOIN category ON article_category.category_id = category.category_id
+                WHERE article_id = ?;
+                """
         cursor.execute(query, (article_id,))
         rows = cursor.fetchall()
         db.close()
@@ -149,17 +142,19 @@ class DBConn:
 
         :param category: category name.
         :type category: int
+        :raises: sqlite3.DatabaseError
         :returns: the list of article_ids associated with that category.
+        :rtype: [(int, str)]
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        SELECT article.article_id, article.title
-        FROM article_category
-            JOIN category ON article_category.category_id = category.category_id
-            JOIN article ON article_category.article_id = article.article_id
-        WHERE name = ?;
-        """
+                SELECT article.article_id, article.title
+                FROM article_category
+                    JOIN category ON article_category.category_id = category.category_id
+                    JOIN article ON article_category.article_id = article.article_id
+                WHERE name = ?;
+                """
         cursor.execute(query, (category,))
         rows = cursor.fetchall()
         db.close()
@@ -174,7 +169,8 @@ class DBConn:
         :param password: the user's password
         :type password: str
         :raises: sqlite3.DatabaseError
-        :return: database user_id or -1 if not found
+        :return: database user_id
+        :rtype: int
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
@@ -192,10 +188,10 @@ class DBConn:
             user.num_answered_correct))
         db.commit()
         query = """
-        SELECT user_id
-        FROM user
-        WHERE username = ?
-        """
+                SELECT user_id
+                FROM user
+                WHERE username = ?
+                """
         cursor.execute(query, (user.username,))
         user_id = cursor.fetchone()[0]
         db.close()
@@ -207,14 +203,16 @@ class DBConn:
         :param user: the DBUser object to be added to the database
         :type user: DBUser
         :raises: sqlite3.DatabaseError
+        :return: database user_id or -1 if user not found
+        :rtype: int
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        UPDATE user
-        SET username = ?, email = ?, wins = ?, losses = ?, num_answered = ?, num_answered_correct = ?
-        WHERE username = ?
-        """
+                UPDATE user
+                SET username = ?, email = ?, wins = ?, losses = ?, num_answered = ?, num_answered_correct = ?
+                WHERE username = ?
+                """
         cursor.execute(query, (
             user.username,
             user.email,
@@ -226,31 +224,51 @@ class DBConn:
         ))
         db.commit()
         query = """
-        SELECT user_id
-        FROM user
-        WHERE username = ?
-        """
+                SELECT user_id
+                FROM user
+                WHERE username = ?
+                """
         cursor.execute(query, (user.username,))
-        rows = cursor.fetchone()
-        if rows is not None:
-            user_id = rows[0]
-        else:
-            user_id = -1
+        row = cursor.fetchone()
         db.close()
-        print('stuff')
-        return user_id
+        if row is not None:
+            return row[0]
+        else:
+            return -1
 
     def update_password(self, username: str, password: str) -> int:
+        """ Updates a user in the database.
+
+        :param username: the DBUser object to be added to the database
+        :type username: str
+        :param password: new password
+        :type password: str
+        :raises: sqlite3.DatabaseError
+        :return: database user_id or -1 if user not found
+        :rtype: int
+        """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        UPDATE user
-        SET password = ?
-        WHERE username = ?
-        """
+                UPDATE user
+                SET password = ?
+                WHERE username = ?
+                """
         cursor.execute(query, (password, username))
         db.commit()
+        query = """
+                SELECT user_id
+                FROM user
+                WHERE username = ?
+                """
+        cursor.execute(query, (username,))
+        row = cursor.fetchone()
+        if row is not None:
+            user_id = row[0]
+        else:
+            user_id = -1
         db.close()
+        return user_id
 
     def select_user(self, username: str) -> Optional[DBUser]:
         """Gets a user from the database by username.
@@ -258,16 +276,16 @@ class DBConn:
         :param username: username to be retrieved
         :type username: str
         :raises sqlite3.DatabaseError:
-        :returns: an object representing a player
-        :rtype: Player
+        :returns: an object representing a player or None
+        :rtype: DBUser or None
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        SELECT user_id, username, email, wins, losses, num_answered, num_answered_correct
-        FROM user
-        WHERE username = ?;
-        """
+                SELECT user_id, username, email, wins, losses, num_answered, num_answered_correct
+                FROM user
+                WHERE username = ?;
+                """
         cursor.execute(query, (username,))
         user = cursor.fetchone()
         db.close()
@@ -286,86 +304,75 @@ class DBConn:
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        DELETE FROM user
-        WHERE username = ?
-        """
+                DELETE FROM user
+                WHERE username = ?
+                """
         cursor.execute(query, (user.username,))
         db.commit()
         db.close()
 
-    # TODO(ALEX): fix tunit and question methods when format finalized
+    def insert_tunit(self, t_unit: TUnit) -> int:
+        """Gets a user from the database by username.
 
-    def insert_tunit(self, tunit: TUnit) -> int:
+        :param t_unit: TUnit to be inserted
+        :type t_unit: TUnit
+        :raises sqlite3.DatabaseError:
+        :returns: t_unit_Id
+        :rtype: int
+        """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        INSERT INTO t_unit (
-            article_id, 
-            sentence, 
-            url, 
-            access_timestamp,
-            lat, 
-            long, 
-            num_likes,
-            num_mehs,
-            num_dislikes)
-        VALUES (?,?,?,?,?,?,?,?,?)
-        """
-        cursor.execute(query, (
-            tunit.article_id,
-            tunit.sentence,
-            tunit.url,
-            tunit.access_timestamp,
-            tunit.latitude,
-            tunit.longitude,
-            tunit.num_likes,
-            tunit.num_mehs,
-            tunit.num_dislikes
-        ))
+                INSERT INTO t_unit (article_id, sentence, url, access_timestamp, lat, long, num_likes, num_mehs,
+                    num_dislikes)
+                VALUES (?,?,?,?,?,?,?,?,?)
+                """
+        cursor.execute(query, (t_unit.article_id, t_unit.sentence, t_unit.url, t_unit.access_timestamp, t_unit.latitude,
+                               t_unit.longitude, t_unit.num_likes, t_unit.num_mehs, t_unit.num_dislikes))
         db.commit()
         query = """
-        SELECT t_unit_Id
-        FROM t_unit
-        WHERE sentence = ?
-        """
-        cursor.execute(query, (tunit.sentence,))
-        t_unit_id = cursor.fetchone()
+                SELECT t_unit_Id
+                FROM t_unit
+                WHERE sentence = ?
+                """
+        cursor.execute(query, (t_unit.sentence,))
+        t_unit_id = cursor.fetchone()[0]
         db.close()
         return t_unit_id
 
-    def update_tunit(self, tunit: TUnit):
+    def update_tunit(self, t_unit: TUnit) -> int:
         """Updates a TUnit in the database.
 
-        :param tunit: a TUnit object to be deleted from database
-        :type tunit: TUnit
+        :param t_unit: a TUnit object to be deleted from database
+        :type t_unit: TUnit
         :raises sqlite3.DatabaseError:
+        :returns: t_unit_Id or -1 of not found
+        :rtype: int
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        UPDATE t_unit
-        SET sentence = ?,
-            url = ?,
-            access_timestamp = ?,
-            lat = ?,
-            long = ?,
-            num_likes = ?,
-            num_mehs = ?,
-            num_dislikes = ?
-        WHERE t_unit_Id = ?
-        """
-        cursor.execute(query, (
-            tunit.sentence,
-            tunit.url,
-            tunit.access_timestamp,
-            tunit.latitude,
-            tunit.longitude,
-            tunit.num_likes,
-            tunit.num_mehs,
-            tunit.num_dislikes
-        ))
+                UPDATE t_unit
+                SET  sentence = ?, article_id = ?, url = ?, access_timestamp = ?, lat = ?, long = ?, num_likes = ?,
+                    num_mehs = ?, num_dislikes = ?
+                WHERE t_unit_Id = ?
+                """
+        cursor.execute(query, (t_unit.sentence, t_unit.article_id, t_unit.url, t_unit.access_timestamp, t_unit.latitude,
+                               t_unit.longitude, t_unit.num_likes, t_unit.num_mehs, t_unit.num_dislikes,
+                               t_unit.t_unit_id))
         db.commit()
+        query = """
+                SELECT t_unit_Id
+                FROM t_unit
+                WHERE t_unit_Id = ?
+                """
+        cursor.execute(query, (t_unit.t_unit_id,))
+        t_unit_Id = cursor.fetchone()
         db.close()
+        if t_unit_Id is not None:
+            return t_unit_Id
+        else:
+            return -1
 
     def select_tunit_random(self) -> TUnit:
         """Gets a TUnit from the database by random.
@@ -375,25 +382,15 @@ class DBConn:
         :rtype: TUnit
         """
         db = sqlite3.connect(self.db_filename)
-        db.row_factory = self.__dict_factory
         cursor = db.cursor()
         query = """
-        SELECT 
-            t_unit_Id,
-            article_id,
-            sentence,
-            url,
-            access_timestamp,
-            lat,
-            long,
-            num_likes,
-            num_mehs,
-            num_dislikes
-        FROM t_unit
-        ORDER BY RANDOM() LIMIT 1;
-        """
+                SELECT sentence, article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
+                    num_dislikes
+                FROM t_unit
+                ORDER BY RANDOM() LIMIT 1;
+                """
         cursor.execute(query)
-        tunit = cursor.fetchone()
+        tunit = TUnit(*cursor.fetchone())
         db.close()
         return tunit
 
@@ -403,57 +400,23 @@ class DBConn:
         :param category: the category used to to find TUnits
         :type category: str
         :raises sqlite3.DatabaseError:
-        :returns: a list of TUNit objects
-        :rtype: List[TUnit]
+        :returns: a list of TUnit objects
+        :rtype: [TUnit] or empty list if category not found
         """
         db = sqlite3.connect(self.db_filename)
-        db.row_factory = self.__dict_factory
         cursor = db.cursor()
         query = """
-        SELECT 
-            t_unit_Id,
-            t.article_id,
-            sentence,
-            url,
-            access_timestamp,
-            lat,
-            long,
-            num_likes,
-            num_mehs,
-            num_dislikes
-        FROM t_unit t
-        JOIN article_category ac on t.article_id = ac.article_id
-        JOIN category c on ac.category_id = c.category_id
-        WHERE c.name = ?
-        """
+                SELECT  sentence, tu.article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
+                    num_dislikes
+                FROM t_unit tu
+                JOIN article_category ac on tu.article_id = ac.article_id
+                JOIN category c on ac.category_id = c.category_id
+                WHERE c.name = ?
+                """
         cursor.execute(query, (category,))
-        db_tunit = cursor.fetchone()
-
-        # query = """
-        # SELECT name
-        # FROM category
-        # JOIN article_category ac on category.category_id = ac.category_id
-        # JOIN t_unit tu on ac.article_id = tu.article_id
-        # WHERE tu.article_id = ?
-        # """
-        # cursor.execute(query, (db_tunit["article_id"],))
-        # categories = []
-        # for row in cursor.fetchall():
-        #     categories.append(row["name"])
-
+        t_unit_list = cursor.fetchall()
         db.close()
-        return TUnit(
-            db_tunit["sentence"],
-            db_tunit["article_id"],
-            db_tunit["url"],
-            db_tunit["access_timestamp"],
-            db_tunit["t_unit_Id"],
-            db_tunit["lat"],
-            db_tunit["long"],
-            db_tunit["num_likes"].
-            db_tunit["num_mehs"],
-            db_tunit["num_dislikes"]
-        )
+        return t_unit_list
 
     def select_tunit_location(self, lat: float, long: float) -> list:
         """Gets a list of TUnits from the database by location.
@@ -464,136 +427,37 @@ class DBConn:
         :type long: float
         :raises sqlite3.DatabaseError:
         :returns: a list of TUNit objects
-        :rtype: List[TUnit]
+        :rtype: [TUnit] or empty list if not found
         """
         db = sqlite3.connect(self.db_filename)
-        db.row_factory = self.__dict_factory
         cursor = db.cursor()
         query = """
-        SELECT t_unit_id, 
-            article_id, 
-            sentence, 
-            rank, 
-            url, 
-            access_timestamp, 
-            lat, 
-            long, 
-            num_likes,
-            num_mehs,
-            num_dislikes
-        FROM t_unit
-        WHERE lat > ? - 0.5 AND lat < ? + 0.5
-        AND 
-        long > ? - 0.5 AND long < ? + 0.5
-        """
+                SELECT sentence, article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
+                    num_dislikes
+                FROM t_unit
+                WHERE lat > ? - 0.5 AND lat < ? + 0.5
+                AND 
+                long > ? - 0.5 AND long < ? + 0.5
+                """
         cursor.execute(query, (lat, lat, long, long))
-        db_tunit = cursor.fetchone()
-        if db_tunit is None:
-            return None
-
-        # query = """
-        # SELECT name
-        # FROM category
-        # JOIN article_category ac on category.category_id = ac.category_id
-        # JOIN t_unit tu on ac.article_id = tu.article_id
-        # WHERE tu.article_id = ?
-        # """
-        # cursor.execute(query, (db_tunit["article_id"],))
-        # categories = []
-        # for row in cursor.fetchall():
-        #     categories.append(row["name"])
-
+        t_unit_list = [TUnit(*t_unit_tuple) for t_unit_tuple in cursor.fetchall()]
         db.close()
-        return TUnit(
-            db_tunit["sentence"],
-            db_tunit["article_id"],
-            db_tunit["url"],
-            db_tunit["access_timestamp"],
-            db_tunit["t_unit_Id"],
-            db_tunit["lat"],
-            db_tunit["long"],
-            db_tunit["num_likes"].
-            db_tunit["num_mehs"],
-            db_tunit["num_dislikes"]
-        )
+        return t_unit_list
 
-    def delete_tunit(self, tunit: TUnit):
-        """Deletes a user from the database.
+    def delete_tunit(self, t_unit: TUnit):
+        """Deletes a TUnit from the database.
 
-        :param tunit: a TUnit object to be deleted from database
-        :type tunit: TUnit
+        :param t_unit: a TUnit object to be deleted from database
+        :type t_unit: TUnit
         :raises sqlite3.DatabaseError:
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        DELETE FROM t_unit
-        WHERE t_unit_Id = ?
-        """
-        cursor.execute(query, (tunit.t_unit_id,))
-        db.commit()
-        db.close()
-
-    def insert_question(self, question: str, answer: str, t_unit_id: int) -> str:
-        """Adds a question entry in the database.
-
-        :param question: the question text to be added
-        :type question: str
-        :param tunit: the TUnit the question is associated with
-        :type tunit: TUnit
-        :raises sqlite3.DatabaseError:
-        """
-        db = sqlite3.connect(self.db_filename)
-        cursor = db.cursor()
-        query = """
-        INSERT INTO question (t_unit_id, text, answer)
-        VALUES (?,?,?)
-        """
-        cursor.execute(query, (t_unit_id, question, answer))
-        db.commit()
-        query = """
-        SELECT qu_id
-        FROM question
-        WHERE text = ?
-        """
-        cursor.execute(query, (question,))
-        q_id = cursor.fetchone()
-        db.commit()
-        db.close()
-        return q_id
-
-    def select_questions(self, tunit: TUnit) -> List[tuple]:
-        """Gets a list of questions associated with a TUnit.
-
-        :param tunit: the TUnit to retrieve questions from
-        :type tunit: TUnit
-        :raises sqlite3.DatabaseError:
-        :return: a list of tuple representions of a question and its answer
-        :rtype: List[(str, str)]
-        """
-        db = sqlite3.connect(self.db_filename)
-        db.row_factory = self.__dict_factory
-        cursor = db.cursor()
-        query = """
-        SELECT text, answer
-        FROM question
-        WHERE t_unit_id = ?
-        """
-        cursor.execute(query, (tunit.t_unit_id,))
-        questions = []
-        for row in cursor.fetchall():
-            questions.append(row["name"])
-        db.close()
-        return questions
-
-    def delete_question(self, question: str):
-        db = sqlite3.connect(self.db_filename)
-        cursor = db.cursor()
-        query = """
-        DELETE FROM question
-        WHERE question.text = ?
-        """
-        cursor.execute(query, (question,))
+                DELETE FROM t_unit
+                WHERE t_unit_Id = ?
+                """
+        cursor.execute(query, (t_unit.t_unit_id,))
         db.commit()
         db.close()
 
@@ -605,20 +469,22 @@ class DBConn:
         :param importance: relevance of category
         :type importance: float
         :raises sqlite3.DatabaseError:
+        :returns: the category id
+        :rtype: int
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        INSERT INTO category (name, importance) 
-        VALUES (?,?)        
-        """
+                INSERT INTO category (name, importance) 
+                VALUES (?,?)        
+                """
         cursor.execute(query, (category, importance))
         db.commit()
         query = """
-        SELECT category_id
-        FROM category
-        WHERE name = ?
-        """
+                SELECT category_id
+                FROM category
+                WHERE name = ?
+                """
         cursor.execute(query, (category,))
         category_id = cursor.fetchone()
         db.close()
@@ -634,33 +500,10 @@ class DBConn:
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-        DELETE FROM category
-        WHERE category.name = ?
-        """
+                DELETE FROM category
+                WHERE category.name = ?
+                """
         cursor.execute(query, (category,))
-        db.commit()
-        db.close()
-
-    def insert_vote(self, user: DBUser, q_id: int, interesting_rating: int, question_rating: int):
-        """Adds a quality vote associated with a user and a question.
-
-        :param user: the user who generated the vote
-        :type user: Player
-        :param question: the question the user voted on
-        :type question: str
-        :param interesting_rating: the rating of how interesting the trivia was
-        :type interesting_rating: int
-        :param question_rating: the rating of understandable the question was
-        :type question_rating: int
-        :raises sqlite3.DatabaseError:
-        """
-        db = sqlite3.connect(self.db_filename)
-        cursor = db.cursor()
-        query = """
-        INSERT INTO votes_on (user_id, q_id, interesting_rating, question_rating)
-        VALUES (?,?,?,?)
-        """
-        cursor.execute(query, (user.user_id, q_id, interesting_rating, question_rating))
         db.commit()
         db.close()
 
@@ -672,22 +515,19 @@ class DBConn:
         :param long: the longitudinal coordinate
         :type long: float
         :raises sqlite3.DatabaseError:
-        :returns: a list of Articles
-        :rtype: List[Article]
+        :returns: a list of tuples representing an article id and title
+        :rtype: [(int, str)]
         """
         db = sqlite3.connect(self.db_filename)
-        db.row_factory = self.__dict_factory
         cursor = db.cursor()
         query = """
-        SELECT a.article_id, title
-        FROM article a
-        JOIN t_unit tu on a.article_id = tu.article_id
-        WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5 AND
-        tu.long > ? - 0.5 AND tu.long < ? + 0.5
-        """
+                SELECT a.article_id, title
+                FROM article a
+                JOIN t_unit tu on a.article_id = tu.article_id
+                WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5 AND
+                tu.long > ? - 0.5 AND tu.long < ? + 0.5
+                """
         cursor.execute(query, (lat, lat, long, long))
-        articles = []
-        for article in cursor.fetchall():
-            articles.append(article)
+        article_list = cursor.fetchall()
         db.close()
-        return articles
+        return article_list

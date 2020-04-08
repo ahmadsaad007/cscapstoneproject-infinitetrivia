@@ -70,6 +70,9 @@ class TUnit:
   - Coordinates:  ({self.latitude}, {self.longitude})
   - Number of Likes/Mehs/Dislikes: {self.num_likes}/{self.mehs}/{self.num_dislikes}"""
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 def tunit_list_to_tsv(tunits: list, output_filename='tunits.tsv'):
     csv_output = '\n'.join([tunit.to_tsv_line() for tunit in tunits]) + '\n'
     with open(output_filename, 'a+') as f:
