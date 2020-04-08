@@ -210,7 +210,7 @@ class DBConn:
         db.commit()
         db.close()
 
-    def select_password(self, username: str):
+    def select_password(self, username: str) -> str:
         """
         Retrieves a password entry from the database for the specified user
 
