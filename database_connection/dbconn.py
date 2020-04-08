@@ -30,9 +30,8 @@ class DBConn:
     Class representing a database connection.
     """
 
-    DB_CONFIG_FILE: str = "database_connection/db.cfg"
+    DB_CONFIG_FILE: str = "db.cfg"
     db_filename: str = None
-    max_importance: float = None
 
     def __init__(self, filename=None):
         if filename is None:
@@ -169,8 +168,12 @@ class DBConn:
         :param password: the user's password
         :type password: str
         :raises: sqlite3.DatabaseError
+<<<<<<< HEAD
         :return: database user_id
         :rtype: int
+=======
+        :return: database user_id or -1 if not found
+>>>>>>> 252d5cef07541f4fd9ffbc3ad8338f3d0b812d8e
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
