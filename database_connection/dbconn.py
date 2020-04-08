@@ -12,7 +12,6 @@ from trivia_generator.web_scraper import Article
 from flask_login import UserMixin
 
 
-
 @dataclass
 class DBUser(UserMixin):
     user_id: int = None
@@ -56,7 +55,7 @@ class DBConn:
             row = cursor.fetchone()
             self.max_importance = row[0]
             db.close()
-        return self.max_importance   
+        return self.max_importance
 
     def select_random_article(self) -> tuple:
         """Selects a random article from the database.
@@ -77,7 +76,7 @@ class DBConn:
         """
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
-        
+
         min_select_importance = random.random() * self.select_max_importance()
 
         query = """
@@ -210,6 +209,25 @@ class DBConn:
         ))
         db.commit()
         db.close()
+
+    def select_password(self, username: str):
+        """
+        Retrieves a password entry from the database for the specified user
+
+        :param username: user's username
+        :type username: str
+        :raises: sqlite3.DatabaseError
+        :return: password entry
+        """
+        db = sqlite3.connect(self.db_filename)
+        query = '''
+        SELECT password
+        FROM user
+        WHERE username = ?
+        '''
+        password = db.cursor().execute(query, (username,)).fetchone()
+        db.close()
+        return password
 
     def update_password(self, username: str, password: str):
         db = sqlite3.connect(self.db_filename)
@@ -417,7 +435,7 @@ class DBConn:
             db_tunit["lat"],
             db_tunit["long"],
             db_tunit["num_likes"].
-            db_tunit["num_mehs"],
+                db_tunit["num_mehs"],
             db_tunit["num_dislikes"]
         )
 
@@ -479,7 +497,7 @@ class DBConn:
             db_tunit["lat"],
             db_tunit["long"],
             db_tunit["num_likes"].
-            db_tunit["num_mehs"],
+                db_tunit["num_mehs"],
             db_tunit["num_dislikes"]
         )
 
