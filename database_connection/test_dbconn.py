@@ -3,6 +3,7 @@ import unittest
 from os import remove, path
 from scipy.stats import chisquare
 
+import __init__
 from database_connection.dbconn import DBConn, DBUser
 from trivia_generator.TUnit import TUnit
 

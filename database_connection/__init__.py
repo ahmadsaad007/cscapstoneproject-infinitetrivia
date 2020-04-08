@@ -1,3 +1,5 @@
-from os import path
+import os
+import sys
 
-top_level_dir = path.abspath('../')
+top_level_dir = os.path.abspath('../')
+sys.path.append(top_level_dir)
