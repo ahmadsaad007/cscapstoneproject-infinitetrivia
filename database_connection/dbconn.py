@@ -186,13 +186,7 @@ class DBConn:
             user.num_answered,
             user.num_answered_correct))
         db.commit()
-        query = """
-                SELECT user_id
-                FROM user
-                WHERE username = ?
-                """
-        cursor.execute(query, (user.username,))
-        user_id = cursor.fetchone()[0]
+        user_id = cursor.lastrowid
         db.close()
         return user_id
 
@@ -227,13 +221,12 @@ class DBConn:
                 FROM user
                 WHERE username = ?
                 """
-        cursor.execute(query, (user.username,))
-        row = cursor.fetchone()
+        user_id = cursor.execute(query, (user.username,)).fetchone()
         db.close()
-        if row is not None:
-            return row[0]
-        else:
+        if user_id is None:
             return -1
+        else:
+            return user_id[0]
 
     def update_password(self, username: str, password: str) -> int:
         """ Updates a user in the database.
@@ -255,19 +248,12 @@ class DBConn:
                 """
         cursor.execute(query, (password, username))
         db.commit()
-        query = """
-                SELECT user_id
-                FROM user
-                WHERE username = ?
-                """
-        cursor.execute(query, (username,))
-        row = cursor.fetchone()
-        if row is not None:
-            user_id = row[0]
-        else:
-            user_id = -1
+        user_id = cursor.lastrowid
         db.close()
-        return user_id
+        if user_id == 0:
+            return -1
+        else:
+            return user_id
 
     def select_user(self, username: str) -> Optional[DBUser]:
         """Gets a user from the database by username.
@@ -329,15 +315,9 @@ class DBConn:
         cursor.execute(query, (t_unit.article_id, t_unit.sentence, t_unit.url, t_unit.access_timestamp, t_unit.latitude,
                                t_unit.longitude, t_unit.num_likes, t_unit.num_mehs, t_unit.num_dislikes))
         db.commit()
-        query = """
-                SELECT t_unit_Id
-                FROM t_unit
-                WHERE sentence = ?
-                """
-        cursor.execute(query, (t_unit.sentence,))
-        t_unit_id = cursor.fetchone()[0]
+        t_unit.t_unit_id = cursor.lastrowid
         db.close()
-        return t_unit_id
+        return t_unit.t_unit_id
 
     def update_tunit(self, t_unit: TUnit) -> int:
         """Updates a TUnit in the database.
@@ -356,22 +336,17 @@ class DBConn:
                     num_mehs = ?, num_dislikes = ?
                 WHERE t_unit_Id = ?
                 """
-        cursor.execute(query, (t_unit.sentence, t_unit.article_id, t_unit.url, t_unit.access_timestamp, t_unit.latitude,
-                               t_unit.longitude, t_unit.num_likes, t_unit.num_mehs, t_unit.num_dislikes,
-                               t_unit.t_unit_id))
+        cursor.execute(query,
+                       (t_unit.sentence, t_unit.article_id, t_unit.url, t_unit.access_timestamp, t_unit.latitude,
+                        t_unit.longitude, t_unit.num_likes, t_unit.num_mehs, t_unit.num_dislikes,
+                        t_unit.t_unit_id))
         db.commit()
-        query = """
-                SELECT t_unit_Id
-                FROM t_unit
-                WHERE t_unit_Id = ?
-                """
-        cursor.execute(query, (t_unit.t_unit_id,))
-        t_unit_Id = cursor.fetchone()
-        db.close()
-        if t_unit_Id is not None:
-            return t_unit_Id
+        if cursor.rowcount == 0:
+            t_unit_Id = -1
         else:
-            return -1
+            t_unit_Id = t_unit.t_unit_id
+        db.close()
+        return t_unit_Id
 
     def select_tunit_random(self) -> TUnit:
         """Gets a TUnit from the database by random.
@@ -413,7 +388,7 @@ class DBConn:
                 WHERE c.name = ?
                 """
         cursor.execute(query, (category,))
-        t_unit_list = cursor.fetchall()
+        t_unit_list = [TUnit(*t_unit_tuple) for t_unit_tuple in cursor.fetchall()]
         db.close()
         return t_unit_list
 
@@ -479,13 +454,7 @@ class DBConn:
                 """
         cursor.execute(query, (category, importance))
         db.commit()
-        query = """
-                SELECT category_id
-                FROM category
-                WHERE name = ?
-                """
-        cursor.execute(query, (category,))
-        category_id = cursor.fetchone()
+        category_id = cursor.lastrowid
         db.close()
         return category_id
 

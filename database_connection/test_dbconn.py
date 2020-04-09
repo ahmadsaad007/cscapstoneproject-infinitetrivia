@@ -59,7 +59,7 @@ class TestDBConn(unittest.TestCase):
         observations = {}
         for j in range(10000):
             article_id, article_text = DBConn(TestDBConn.DB_FILENAME).select_random_article()
-            self.assertEqual(article_id, ord(article_text) - 97)
+            self.assertEqual(article_id, ord(article_text) - 96)
             if article_id in observations.keys():
                 observations[article_id] += 1
             else:
@@ -71,14 +71,14 @@ class TestDBConn(unittest.TestCase):
         self.assertLess(act_chisq, exp_max_chisq)
 
     def test_select_article_categories(self):
-        article_id = 0
+        article_id = 1
         exp_categories = ['category_a', 'category_b', 'category_c']
         act_categories = DBConn(TestDBConn.DB_FILENAME).select_article_categories(article_id)
         self.assertEqual(exp_categories, act_categories)
 
     def test_select_category_articles(self):
         category = 'category_b'
-        exp_articles = [(0, 'a'), (1, 'b')]
+        exp_articles = [(1, 'a'), (3, 'c')]
         act_articles = DBConn(TestDBConn.DB_FILENAME).select_category_articles(category)
         self.assertEqual(exp_articles, act_articles)
 
@@ -146,7 +146,7 @@ class TestDBConn(unittest.TestCase):
         self.assertEqual(exp_password, act_password)
 
     def test_select_user_exists(self):
-        exp_user = DBUser(0, 'Jill', 'jill@email.com', 5, 5, 10, 5)
+        exp_user = DBUser(1, 'Jill', 'jill@email.com', 5, 5, 10, 5)
         act_user = DBConn(TestDBConn.DB_FILENAME).select_user('Jill')
         self.assertEqual(exp_user, act_user)
 
@@ -169,6 +169,23 @@ class TestDBConn(unittest.TestCase):
     def test_insert_tunit(self):
         exp_t_unit = TUnit('sentence', 0, 'url', 1234, None, 10, 10, 0, 0, 0)
         t_unit_Id = DBConn(TestDBConn.DB_FILENAME).insert_tunit(exp_t_unit)
+        self.assertEqual(t_unit_Id, exp_t_unit.t_unit_id)
+        conn = sqlite3.connect(TestDBConn.DB_FILENAME)
+        query = """
+                SELECT sentence, article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
+                    num_dislikes
+                FROM t_unit
+                WHERE t_unit_Id = ?;
+                """
+        row = conn.cursor().execute(query, (t_unit_Id,)).fetchone()
+        conn.close()
+        act_t_unit = TUnit(*row)
+        self.assertEqual(exp_t_unit, act_t_unit)
+
+    # TODO(Alex): test_update_tunit_exists()
+    def test_update_tunit_exists(self):
+        exp_t_unit = TUnit('test_sentence', 0, 'url', 1234, 1, 10, 10, 99, 99, 99)
+        t_unit_Id = DBConn(TestDBConn.DB_FILENAME).update_tunit(exp_t_unit)
         conn = sqlite3.connect(TestDBConn.DB_FILENAME)
         query = """
                 SELECT sentence, article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
@@ -177,23 +194,16 @@ class TestDBConn(unittest.TestCase):
                 WHERE t_unit_Id = ?;
                 """
         cursor = conn.cursor()
-        cursor.execute(query, (t_unit_Id,))
-        rows = cursor.fetchall()
-        # rows = conn.cursor().execute(query, (t_unit_Id,)).fetchall()
+        row = cursor.execute(query, (t_unit_Id,)).fetchone()
         conn.close()
-        self.assertEqual(len(rows), 1)
-        row = rows[0]  # row: ('sentence', 0, 'url', 1234, <t_unit_Id>, 10, 10, 0, 0, 0)
-        exp_t_unit.t_unit_id = row[4]
         act_t_unit = TUnit(*row)
         self.assertEqual(exp_t_unit, act_t_unit)
 
-    # TODO(Alex): test_update_tunit_exists()
-    def test_update_tunit_exists(self):
-        pass
-
     # TODO(Alex): test_update_tunit_does_not_exist()
     def test_update_tunit_does_not_exist(self):
-        pass
+        exp_t_unit = TUnit('test_sentence', 0, 'url', 1234, 99, 10, 10, 99, 99, 99)
+        t_unit_Id = DBConn(TestDBConn.DB_FILENAME).update_tunit(exp_t_unit)
+        self.assertEqual(-1, t_unit_Id)
 
     # TODO(Alex): test_select_tunit_random()
 
@@ -230,13 +240,13 @@ class TestDBConn(unittest.TestCase):
         self.assertIsNone(act_category)
 
     def test_select_articles_location_positive(self):
-        exp_articles = [(0, 'a'), (1, 'b')]
+        exp_articles = [(1, 'a'), (2, 'b')]
         location = (30.1, 30.1)
         act_articles = DBConn(TestDBConn.DB_FILENAME).select_articles_location(*location)
         self.assertEqual(exp_articles, act_articles)
 
     def test_select_articles_location_negative(self):
-        exp_articles = [(2, 'c')]
+        exp_articles = [(3, 'c')]
         location = (-30.1, 30.1)
         act_articles = DBConn(TestDBConn.DB_FILENAME).select_articles_location(*location)
         self.assertEqual(exp_articles, act_articles)
