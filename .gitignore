@@ -146,5 +146,9 @@ itdb.db
 *~
 *#
 
+<<<<<<< HEAD
 # VS Code
+=======
+#VS Code
+>>>>>>> master
 .vscode
