@@ -296,29 +296,6 @@ class DBConn:
         db.commit()
         db.close()
 
-    def insert_tunit(self, t_unit: TUnit) -> int:
-        """Gets a user from the database by username.
-
-        :param t_unit: TUnit to be inserted
-        :type t_unit: TUnit
-        :raises sqlite3.DatabaseError:
-        :returns: t_unit_Id
-        :rtype: int
-        """
-        db = sqlite3.connect(self.db_filename)
-        cursor = db.cursor()
-        query = """
-                INSERT INTO t_unit (article_id, sentence, url, access_timestamp, lat, long, num_likes, num_mehs,
-                    num_dislikes)
-                VALUES (?,?,?,?,?,?,?,?,?)
-                """
-        cursor.execute(query, (t_unit.article_id, t_unit.sentence, t_unit.url, t_unit.access_timestamp, t_unit.latitude,
-                               t_unit.longitude, t_unit.num_likes, t_unit.num_mehs, t_unit.num_dislikes))
-        db.commit()
-        t_unit.t_unit_id = cursor.lastrowid
-        db.close()
-        return t_unit.t_unit_id
-
     def update_tunit(self, t_unit: TUnit) -> int:
         """Updates a TUnit in the database.
 
@@ -331,22 +308,17 @@ class DBConn:
         db = sqlite3.connect(self.db_filename)
         cursor = db.cursor()
         query = """
-                UPDATE t_unit
-                SET  sentence = ?, article_id = ?, url = ?, access_timestamp = ?, lat = ?, long = ?, num_likes = ?,
-                    num_mehs = ?, num_dislikes = ?
-                WHERE t_unit_Id = ?
+                REPLACE INTO t_unit (t_unit_Id, sentence, article_id, url, access_timestamp, lat, long, num_likes,
+                    num_mehs, num_dislikes)
+                VALUES (?,?,?,?,?,?,?,?,?,?);
                 """
         cursor.execute(query,
-                       (t_unit.sentence, t_unit.article_id, t_unit.url, t_unit.access_timestamp, t_unit.latitude,
-                        t_unit.longitude, t_unit.num_likes, t_unit.num_mehs, t_unit.num_dislikes,
-                        t_unit.t_unit_id))
+                       (t_unit.t_unit_id, t_unit.sentence, t_unit.article_id, t_unit.url, t_unit.access_timestamp,
+                        t_unit.latitude, t_unit.longitude, t_unit.num_likes, t_unit.num_mehs, t_unit.num_dislikes))
         db.commit()
-        if cursor.rowcount == 0:
-            t_unit_Id = -1
-        else:
-            t_unit_Id = t_unit.t_unit_id
+        t_unit.t_unit_id = cursor.lastrowid
         db.close()
-        return t_unit_Id
+        return t_unit.t_unit_id
 
     def select_tunit_random(self) -> TUnit:
         """Gets a TUnit from the database by random.

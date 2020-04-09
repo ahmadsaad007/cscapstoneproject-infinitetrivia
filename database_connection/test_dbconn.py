@@ -166,9 +166,9 @@ class TestDBConn(unittest.TestCase):
         act_user = conn.cursor().execute(query, (user.username,)).fetchone()
         self.assertIsNone(act_user)
 
-    def test_insert_tunit(self):
-        exp_t_unit = TUnit('sentence', 0, 'url', 1234, None, 10, 10, 0, 0, 0)
-        t_unit_Id = DBConn(TestDBConn.DB_FILENAME).insert_tunit(exp_t_unit)
+    def test_update_tunit_exists(self):
+        exp_t_unit = TUnit('test_sentence', 1, 'url', 1234, 1, 10, 10, 4, 4, 4)
+        t_unit_Id = DBConn(TestDBConn.DB_FILENAME).update_tunit(exp_t_unit)
         self.assertEqual(t_unit_Id, exp_t_unit.t_unit_id)
         conn = sqlite3.connect(TestDBConn.DB_FILENAME)
         query = """
@@ -182,10 +182,12 @@ class TestDBConn(unittest.TestCase):
         act_t_unit = TUnit(*row)
         self.assertEqual(exp_t_unit, act_t_unit)
 
-    # TODO(Alex): test_update_tunit_exists()
-    def test_update_tunit_exists(self):
-        exp_t_unit = TUnit('test_sentence', 0, 'url', 1234, 1, 10, 10, 99, 99, 99)
+        pass
+
+    def test_update_tunit_does_not_exist(self):
+        exp_t_unit = TUnit('sentence', 1, 'url', 1234, None, 10, 10, 0, 0, 0)
         t_unit_Id = DBConn(TestDBConn.DB_FILENAME).update_tunit(exp_t_unit)
+        self.assertEqual(t_unit_Id, exp_t_unit.t_unit_id)
         conn = sqlite3.connect(TestDBConn.DB_FILENAME)
         query = """
                 SELECT sentence, article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
@@ -193,29 +195,52 @@ class TestDBConn(unittest.TestCase):
                 FROM t_unit
                 WHERE t_unit_Id = ?;
                 """
-        cursor = conn.cursor()
-        row = cursor.execute(query, (t_unit_Id,)).fetchone()
+        row = conn.cursor().execute(query, (t_unit_Id,)).fetchone()
         conn.close()
         act_t_unit = TUnit(*row)
         self.assertEqual(exp_t_unit, act_t_unit)
 
-    # TODO(Alex): test_update_tunit_does_not_exist()
-    def test_update_tunit_does_not_exist(self):
-        exp_t_unit = TUnit('test_sentence', 0, 'url', 1234, 99, 10, 10, 99, 99, 99)
-        t_unit_Id = DBConn(TestDBConn.DB_FILENAME).update_tunit(exp_t_unit)
-        self.assertEqual(-1, t_unit_Id)
+    def test_select_tunit_random(self):
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30, 30, 0, 0, 0),
+                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.25, 30.25, 1, 1, 1),
+                           TUnit('sentence_c', 3, 'url', 1234, 3, -30, 30, 2, 2, 2),
+                           TUnit('sentence_d', 4, 'url', 1234, 4, 10, 10, 3, 3, 3)]
+        act_t_unit = DBConn(TestDBConn.DB_FILENAME).select_tunit_random()
+        self.assertIn(act_t_unit, exp_t_unit_list)
 
-    # TODO(Alex): test_select_tunit_random()
+    def test_select_tunit_category_exists(self):
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30, 30, 0, 0, 0),
+                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.25, 30.25, 1, 1, 1)]
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('category_a')
+        self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
-    # TODO(Alex): test_select_tunit_category_exists()
+    def test_select_tunit_category_does_not_exist(self):
+        exp_t_unit_list = []
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('does not exist')
+        self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
-    # TODO(Alex): test_select_tunit_category_does_not_exists()
+    def test_select_tunit_location_exists(self):
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30, 30, 0, 0, 0),
+                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.25, 30.25, 1, 1, 1)]
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_location(30.1, 30.1)
+        self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
-    # TODO(Alex): test_select_tunit_location_exists()
+    def test_select_tunit_location_does_not_exist(self):
+        exp_t_unit_list = []
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_location(0,0)
+        self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
-    # TODO(Alex): test_select_tunit_loaction_does_not_exist()
-
-    # TODO(Alex): test_delet_tunit()
+    def test_delete_tunit(self):
+        t_unit = TUnit('sentence_a', 1, 'url', 1234, 1, 30, 30, 0, 0, 0)
+        DBConn(TestDBConn.DB_FILENAME).delete_tunit(t_unit)
+        query = '''
+                SELECT t_unit_Id
+                FROM t_unit
+                WHERE t_unit_Id = ?
+                '''
+        conn = sqlite3.connect(TestDBConn.DB_FILENAME)
+        row = conn.cursor().execute(query, (1,)).fetchone()
+        self.assertIsNone(row)
 
     def test_insert_category(self):
         exp_category = ('category', 1.5)
