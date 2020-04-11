@@ -5,6 +5,7 @@ Database Connection
 from dataclasses import dataclass
 import random
 import sqlite3
+import os
 
 from trivia_generator.TUnit import TUnit
 from typing import Optional
@@ -32,11 +33,15 @@ class DBConn:
 
     DB_CONFIG_FILE: str = "db.cfg"
     db_filename: str = None
+    max_importance: float = None
 
     def __init__(self, filename=None):
         if filename is None:
-            with open(DBConn.DB_CONFIG_FILE, "r") as file:
-                self.db_filename = file.read().split("=")[1]
+            here = os.path.dirname(os.path.abspath(__file__))
+            filename = os.path.join(here, DBConn.DB_CONFIG_FILE)
+            with open(filename, "r") as file:
+                self.db_filename = os.path.join(here, file.read().split("=")[1])
+            print()
         else:
             self.db_filename = filename
 
