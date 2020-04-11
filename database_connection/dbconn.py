@@ -37,11 +37,10 @@ class DBConn:
 
     def __init__(self, filename=None):
         if filename is None:
-            here = os.path.dirname(os.path.abspath(__file__))
-            filename = os.path.join(here, DBConn.DB_CONFIG_FILE)
-            with open(filename, "r") as file:
-                self.db_filename = os.path.join(here, file.read().split("=")[1])
-            print()
+            local_path = os.path.dirname(os.path.abspath(__file__))
+            config_filepath = os.path.join(local_path, DBConn.DB_CONFIG_FILE)
+            with open(config_filepath, "r") as file:
+                self.db_filename = os.path.join(local_path, file.read().split("=")[1])
         else:
             self.db_filename = filename
 
