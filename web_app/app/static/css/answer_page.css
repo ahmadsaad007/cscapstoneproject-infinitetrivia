@@ -16,7 +16,19 @@ body {
   text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
 }
 
-  
+nav {
+  background-color: rgba(0, 0, 0, 0.338); 
+  text-align: center;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+nav a {
+  text-decoration: none;
+  font-size: 12px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
   a {
       color: #2A679F;
   }
@@ -147,13 +159,13 @@ h2 {
   font-size: inherit;
 }
 
-.container {
-  margin: 0 auto;
-  min-width: 800px;
-  max-width: 1200px;
-  text-align: center;
-}
 
+.container {
+	max-width:400px;
+	width:100%;
+	margin:0 auto;
+	position:relative;
+}
 .side {
   float: left;
   width: 120px;

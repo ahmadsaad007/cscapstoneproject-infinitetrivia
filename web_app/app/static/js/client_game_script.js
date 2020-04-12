@@ -91,15 +91,14 @@ function display_splash_screen(round_number){
 
 
 function display_text_response_prompt(){
-    const prompt = '<b>Answer:</b> <input id="text_answer">';
-    const submit = '<button class="room" type="button" id="submit">Submit!</button>';
+
     // const prompt = '<b>Answer:</b> <input id="text_answer">';
     // const submit = '<button type="button" id="submit">Submit!</button>';
     // $('#game_container').empty();
     // $('#game_container').append(prompt);
     // $('#game_container').append(submit);
     // // connect button to submit event
-    const html = '<div class="form-style-6"><h1>Enter your answer here</h1><form class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here" required><input type="button" id="submit"></form></div>';
+    const html = '<form class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here" required><input type="button" id="submit" value="submit"></form>';
     // const html = '<h1>Enter your answer here</h1><div class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here"><input type="button" id="submit"></div>';
     $('#game_container').empty();
     $('#game_container').append(html);
