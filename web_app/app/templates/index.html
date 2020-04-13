@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Infinite Trivia</title>
+  <link id="page_style" rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+
+  <!--<link rel="stylesheet" id="page_style" href="{{ url_for('static', filename='css/index.css') }}">-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    
+    <header> </header>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="{{ url_for('login_page') }}">LOGIN/REGISTER</a>
+      <!--<a href="#" id="registration-button">REGISTRATION</a>-->          
+    </nav> 
+      
+    <div class="container" id="home_screen_container">  
+      <div id="contact" action="" method="post">
+        <h3>Infinite Trivia</h3>
+        <h4><img src="{{ url_for('static', filename='img/expandingyeet.png') }}" alt="cat"></h4>
+
+        <form>
+          <button type="submit" formaction="{{ url_for('create_room_page') }}">Create Room</button>
+        </form> 
+      
+        <form>
+          <fieldset>
+            <input placeholder="Name" type="text" tabindex="1" required autofocus id="game_name">
+            <div id="code_error_container"></div>
+          </fieldset>
+          <fieldset>
+            <input placeholder="Room Code" type="email" tabindex="2" required id="room_code">
+            <div id="name_error_container"> </div>
+          </fieldset>
+          
+          <fieldset>
+            <button name="submit" type="submit" id="join_room_button" data-submit="...Sending">Join Room</button>
+          </fieldset>
+        </form>
+
+      </div>
+    </div>
+    <div id="game_container"></div>
+
+    <footer></footer>
+    
+  </div>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/client_game_script.js') }}"></script>
+  <script src="client_game_script.js"></script>
+</body>
+</html>
+

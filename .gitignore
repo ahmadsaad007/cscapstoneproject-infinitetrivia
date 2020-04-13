@@ -137,7 +137,15 @@ dmypy.json
 
 # Database
 itdb.db
+database_connection/itdb.db
 *.tsv
 
 # PyCharm
 .idea/
+
+# Emacs
+*~
+*#
+
+#VS Code
+.vscode

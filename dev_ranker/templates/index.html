@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/question_page.css') }}">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <title>Trivia Ranker</title>
+  </head>
+  <body>
+    <h1 id="trivia">Who was the realest in 1865?</h1>
+    <fieldset>
+      <button name="dislike" type="button" id="dislike_button">Dislike (1)</button>
+      <button name="meh" type="button" id="meh_button">Meh (2)</button>
+      <button name="like" type="button" id="like_button">Like (3)</button>
+    </fieldset>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

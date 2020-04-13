@@ -6,6 +6,7 @@ Gets contents and metadata from Wikipedia articles.
 """
 import json
 import random
+import re
 import time
 
 import requests
@@ -49,12 +50,12 @@ def get_page_by_random() -> Article:
     page_html = None
     url = None
     while page_html is None:
-        article_id, title = DBConn().select_random_article()
+        article_id, title, importance = DBConn().select_weighted_random_article()
         url = BASE_URL + title.replace(' ', '_')
         page_html = _get_page_from_title(title)
     access_timestamp = int(time.time())
 
-    article = _get_article_features(page_html, url, access_timestamp, article_id)
+    article = _get_article_features(page_html, url, access_timestamp, article_id, importance)
     return article
 
 # TODO change to make sure articles are in database.
@@ -163,7 +164,7 @@ def _get_page_and_url(url: str) -> (str, str):
         return None, None
     return page_html, req.url
 
-def _get_article_features(page_html: str, url: str, access_timestamp: int, article_id: int = 1) -> Article:
+def _get_article_features(page_html: str, url: str, access_timestamp: int, article_id: int = 1, importance: float = -1) -> Article:
     """Parses the features of Article from the page html.
 
     :param page_html: the HTML of the page.
@@ -181,11 +182,13 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
     for tag in soup.findAll('p'):
         content += ''.join(tag.strings) + '\n'
 
-    categories = DBConn().select_article_categories(article_id)
-    # Convert list of tuples to list of strings.
-    categories = [category[0] for category in categories]
+    content = preprocess_text(content)
 
     # Get categories from original Wikipedia article.
+    # categories = DBConn().select_article_categories(article_id)
+
+    # Convert list of tuples to list of strings.
+    # categories = [category[0] for category in categories]
     # categories_div = soup.find('div', {'id': 'mw-normal-catlinks'})
     # if categories_div.ul.children:
     #     for li in categories_div.ul.children:
@@ -201,7 +204,7 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
         longitude = None
         latitude = None
     
-    article = Article(content, url, article_id, categories, access_timestamp, latitude, longitude)
+    article = Article(content, url, article_id, importance, access_timestamp, latitude, longitude)
     return article
 
 
@@ -233,3 +236,16 @@ def convert_dms_to_decimal(dms_coord: str) -> float:
     except Exception as e:
         print(e, dms_coord)
         return None
+
+def preprocess_text(content: str) -> str:
+    # Remove sentences that end with [citation needed].
+    while '[citation needed]' in content:
+        content = re.sub(r'\.([^.]*?\.)\[citation needed\]', '.', content)
+
+    # Remove citations and notes.
+    content = re.sub(r' ?\[.*?\]', '', content)
+
+    # Remove content in parentheses.
+    content = re.sub(r' ?\(.*?\)', '', content)
+
+    return content
