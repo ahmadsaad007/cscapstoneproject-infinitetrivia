@@ -181,7 +181,13 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
     soup = bs4.BeautifulSoup(page_html, features="html.parser")
     content = ''
     for tag in soup.findAll('p'):
-        content += ''.join(tag.strings) + '\n'
+        span_tags = tag.findAll('span')
+        # Check if there is LaTeX in the paragraph tag.
+        for span in span_tags:
+            if span.has_attr('mwe-math-element'):
+                break
+        else:
+            content += ''.join(tag.strings) + '\n'
 
     content = preprocess_text(content)
     content = features.resolve_coreferences(content)
