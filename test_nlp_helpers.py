@@ -90,3 +90,23 @@ def test_sentence_has_context():
         print(sentence_str)
         result = features.sentence_has_context(sentence)
         assert expected == result
+
+def test_resolve_coreferences():
+    test_suite = [
+        (
+            """Carlos Orta was a dancer, choreographer and teacher with the José Limón Dance Company in New York since 1979. Mr. Orta was born in Caracas, Venezuela and trained at the Scola Cantorum in Paris. He also later studied with Pina Bausch at Germany's Folkwang Hochschule.
+
+He was the founder and director of the Corearte Dance Company of Venezuela, a dance troupe which performed his original moves, often based on Venezuelan folk dances.
+
+He won the International Academy of Dance's choreography award in Cologne, Germany, and Venezuela's Prize of Dance. Carlos Orta also taught at Long Island University and Manhattanville College.""",
+            """Carlos Orta was a dancer, choreographer and teacher with the José Limón Dance Company in New York since 1979. Mr. Orta was born in Caracas, Venezuela and trained at the Scola Cantorum in Paris. Carlos Orta also later studied with Pina Bausch at Germany's Folkwang Hochschule.
+
+Carlos Orta was the founder and director of the Corearte Dance Company of Venezuela, a dance troupe which performed his original moves, often based on Venezuelan folk dances.
+
+Carlos Orta won the International Academy of Dance's choreography award in Cologne, Germany, and Venezuela's Prize of Dance. Carlos Orta also taught at Long Island University and Manhattanville College.""")
+    ]
+
+    for sentence_str, expected in test_suite:
+        print(sentence_str)
+        result = features.resolve_coreferences(sentence_str)
+        assert expected == result

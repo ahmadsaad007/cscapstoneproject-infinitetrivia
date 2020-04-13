@@ -13,6 +13,7 @@ import requests
 import bs4
 
 from database_connection.dbconn import DBConn
+from nlp_helpers import features
 
 from .Article import Article
 
@@ -180,15 +181,23 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
     soup = bs4.BeautifulSoup(page_html, features="html.parser")
     content = ''
     for tag in soup.findAll('p'):
-        content += ''.join(tag.strings) + '\n'
+        span_tags = tag.findAll('span')
+        # Check if there is LaTeX in the paragraph tag.
+        for span in span_tags:
+            if span.has_attr('mwe-math-element'):
+                break
+        else:
+            content += ''.join(tag.strings) + '\n'
 
     content = preprocess_text(content)
+    content = features.resolve_coreferences(content)
 
     # Get categories from original Wikipedia article.
-    # categories = DBConn().select_article_categories(article_id)
+    categories = DBConn().select_article_categories(article_id)
 
     # Convert list of tuples to list of strings.
-    # categories = [category[0] for category in categories]
+    categories = [category[0] for category in categories]
+
     # categories_div = soup.find('div', {'id': 'mw-normal-catlinks'})
     # if categories_div.ul.children:
     #     for li in categories_div.ul.children:
@@ -204,7 +213,7 @@ def _get_article_features(page_html: str, url: str, access_timestamp: int, artic
         longitude = None
         latitude = None
     
-    article = Article(content, url, article_id, importance, access_timestamp, latitude, longitude)
+    article = Article(content, url, article_id, categories, importance, access_timestamp, latitude, longitude)
     return article
 
 
