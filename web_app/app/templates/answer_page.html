@@ -15,8 +15,12 @@
 </head>
 <body>
     <div class="form-style-6">
-        <h1>Enter your answer here</h1>
-     
+        <h1></h1>
+       <nav>
+      <a href="index.html">HOME</a>
+      <a href="{{ url_for('login_page') }}">LOGIN/REGISTER</a>
+      <!--<a href="#" id="registration-button">REGISTRATION</a>-->          
+    </nav> 
         <form class="form-wrapper">
             <input type="text" id="answer" placeholder="Type answer here" required>
             <input type="submit" id="submit">

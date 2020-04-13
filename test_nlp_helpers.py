@@ -63,8 +63,7 @@ def test_is_complete_sentence():
         ("In 2006, Downey returned to television when he did voice acting on Family Guy in the episode \"The Fat Guy Strangler\".", True),
         ("Main articles: Robert Downey Jr. filmography and List of awards and nominations received by Robert Downey Jr.", False),
         ("John may also refer to: ", False),
-        ("Third Epistle of John, often shortened to 3 John", False),
-        ("was a German academic, librarian and lexicographer.", True)
+        ("Third Epistle of John, often shortened to 3 John", False)
     ]
 
     for sentence_str, expected in test_suite:
@@ -83,9 +82,7 @@ def test_sentence_has_context():
         ("In April 2001, while he was on parole", False),
         ("In 2006, Downey returned to television when he did voice acting on Family Guy in the episode \"The Fat Guy Strangler\".", True),
         ("Main articles: Robert Downey Jr. filmography and List of awards and nominations received by Robert Downey Jr.", False),
-        ("John may also refer to: ", True),
-        ("Third Epistle of John, often shortened to 3 John", False),
-        ("was a German academic, librarian and lexicographer.", False)
+        ("John may also refer to: ", True)
     ]
 
     for sentence_str, expected in test_suite:
