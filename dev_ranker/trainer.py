@@ -2,7 +2,7 @@ import sys
 import os
 import random
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 
 top_level_dir = os.path.abspath('../')
@@ -10,10 +10,15 @@ sys.path.append(top_level_dir)
 
 from trivia_generator.web_scraper.WebScraper import get_page_by_random
 from trivia_generator.NLPPreProcessor import create_TUnits
+from database_connection.dbconn import DBConn
 
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
+tunit_dictionary = dict()
+
+dbconn = DBConn()
 
 
 @app.route('/')
@@ -24,36 +29,34 @@ def index():
 
 @socketio.on('update_rank')
 def update_rank(rank):
-    if rank == 'like':
-        pass
-    elif rank == 'dislike':
-        pass
-    elif rank == 'meh':
-        pass
-    else:
-        pass
+    try:
+        tunit = tunit_dictionary[request.sid]
+        if rank == 'like':
+            tunit.num_likes += 1
+        elif rank == 'dislike':
+            tunit.num_dislikes += 1
+        elif rank == 'meh':
+            tunit.num_mehs += 1
+        else:
+            print("invalid rank submitted")
+        # update tunit in database
+        dbconn.update_tunit(tunit)
+    except KeyError:
+        print("could not find SID")
 
 
 @socketio.on('request_trivia')
 def request_trivia(info):
     trivia_article = get_page_by_random()
     tunit_list = create_TUnits(trivia_article)
-    trivia = None
-    for tunit in tunit_list:
-        if is_interesting(tunit):
-            trivia = tunit
-            print('interesting trivia!!!')
-            break
-    if trivia is None:
-        trivia = random.choice(tunit_list)
-        print('uninteresting trivia...')
+    while not tunit_list:
+        print("bad article!")
+        trivia_article = get_page_by_random()
+        tunit_list = create_TUnits(trivia_article)
+    trivia = random.choice(tunit_list)
+    tunit_dictionary[request.sid] = trivia
     return trivia.sentence
 
 
-def is_interesting(tunit):
-    return (tunit.has_superlative or
-            tunit.has_contrasting)
-
-
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')
