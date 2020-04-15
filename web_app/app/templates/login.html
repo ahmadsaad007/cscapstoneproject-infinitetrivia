@@ -32,11 +32,12 @@
           
           <div class="btn-animate">
             <a class="btn-signin">Sign in</a>
+            <input type="submit" value="Submit!" />
           </div>
         </form>
           
         <form class="form-signup" action="/signup" method="post" name="signup">
-          <label for="fullname">Full name</label>
+          <label for="username">Full name</label>
             <input class="form-styling" type="text" name="username" placeholder=""/>
           <label for="email">Email</label>
             <input class="form-styling" type="text" name="email" placeholder=""/>
@@ -45,7 +46,8 @@
           <label for="confirmpassword">Confirm password</label>
             <input class="form-styling" type="text" name="confirmpassword" placeholder=""/>
 
-          <a ng-click="checked = !checked" class="btn-signup">Sign Up</a>
+            <input type="submit" value="Submit!" />
+          <!--<a ng-click="checked = !checked" class="btn-signup">Sign Up</a>-->
         </form>
         
         <div class="success">
