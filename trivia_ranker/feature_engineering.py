@@ -95,7 +95,7 @@ def generate_training_data():
     with open('training_data.csv','w', newline='') as file:
         wr = csv.writer(file, dialect='excel', delimiter=',')
         for index in range(len(sentence_list)):
-            wr.writerow([sentence_list[index], uni_features[index], has_contra[index], has_super[index], fog[index], like_ratios[index]])
+            wr.writerow([sentence_list[index], ner_ratio[index], uni_features[index], has_contra[index], has_super[index], fog[index], like_ratios[index]])
 
 
 generate_training_data()
