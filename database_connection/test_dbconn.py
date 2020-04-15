@@ -10,6 +10,7 @@ from trivia_generator.TUnit import TUnit
 
 class TestDBConn(unittest.TestCase):
     DB_FILENAME = 'test.db'
+    SEARCH_RADIUS = 50
     SCHEMA_FILENAME = 'test_sql/test_schema.sql'
     DATA_FILENAME = 'test_sql/test_data.sql'
     REMOVE_DATA_FILENAME = 'test_sql/test_remove_data.sql'
@@ -222,7 +223,7 @@ class TestDBConn(unittest.TestCase):
     def test_select_tunit_location_exists(self):
         exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30, 30, 0, 0, 0),
                            TUnit('sentence_b', 2, 'url', 1234, 2, 30.25, 30.25, 1, 1, 1)]
-        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_location(30.1, 30.1)
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location(30.1, 30.1)
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_select_tunit_location_does_not_exist(self):
