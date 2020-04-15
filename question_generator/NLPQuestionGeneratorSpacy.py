@@ -20,6 +20,14 @@ def nlp_question_generation(sentence):
     Creates a mix of multiple choice and wh-questions
     """
     doc = nlp(sentence)
+    questions = []
+    for ent in doc.ents:
+        question = sentence[:ent.start_char] + "______" + sentence[ent.end_char:]
+        answer = ent.text
+        questions.append((question, answer))
+    return questions
+    """
+    doc = nlp(sentence)
     hasQuestionMark = False #  boolean to check if it's a wh question or fib questions
     questions = []
     for ent in doc.ents:
@@ -59,7 +67,7 @@ def nlp_question_generation(sentence):
             question = sentence[:ent.start_char] + questionTag + sentence[ent.end_char:]
         answer = ent.text
         questions.append((question, answer))
-    return questions
+    return questions"""
 
 
 def main():

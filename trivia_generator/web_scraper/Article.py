@@ -28,6 +28,7 @@ class Article:
     content: str
     url: str
     article_id: int
+    categories: list
     importance: float
     access_timestamp: int
     
@@ -35,9 +36,12 @@ class Article:
     longitude: float = None
 
     def __str__(self):
+        categories_str = '\n      - '.join(self.categories)
         return f"""Article:
   - Content: '{self.content[:137]}...'
   - URL: {self.url}
+  - Categories:
+    - {categories_str}
   - Article ID: {self.article_id}
   - Importance: {self.importance}
   - Access Timestamp: {self.access_timestamp}

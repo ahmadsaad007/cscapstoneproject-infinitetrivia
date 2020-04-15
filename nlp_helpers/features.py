@@ -71,6 +71,18 @@ def sentence_has_context(sentence) -> bool:
 def resolve_coreferences(content: str) -> str:
     nlp = NLPConn.get_nlp_conn()
     doc = nlp(content)
-    resolved_coref = doc._.coref_resolved
-    print(resolved_coref)
+    resolved_coref = get_resolved(doc, doc._.coref_clusters)
+        
     return resolved_coref
+
+def get_resolved(doc, clusters):
+    ''' Return a list of utterrances text where the coref are resolved to the most representative mention'''
+    resolved = list(tok.text_with_ws for tok in doc)
+    sent_subjs = [t for t in doc if t.dep_ == 'nsubj']
+    for cluster in clusters:
+        for coref in cluster:
+            if coref != cluster.main and any([tok in sent_subjs for tok in coref]):
+                resolved[coref.start] = cluster.main.text + doc[coref.end-1].whitespace_
+                for i in range(coref.start+1, coref.end):
+                    resolved[i] = ""
+    return ''.join(resolved)

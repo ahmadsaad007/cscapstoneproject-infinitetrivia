@@ -137,6 +137,7 @@ dmypy.json
 
 # Database
 itdb.db
+database_connection/itdb.db
 *.tsv
 
 # PyCharm

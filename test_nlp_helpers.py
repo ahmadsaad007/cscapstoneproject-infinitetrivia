@@ -63,8 +63,7 @@ def test_is_complete_sentence():
         ("In 2006, Downey returned to television when he did voice acting on Family Guy in the episode \"The Fat Guy Strangler\".", True),
         ("Main articles: Robert Downey Jr. filmography and List of awards and nominations received by Robert Downey Jr.", False),
         ("John may also refer to: ", False),
-        ("Third Epistle of John, often shortened to 3 John", False),
-        ("10 May 1758) was a German academic, librarian and lexicographer.", False)
+        ("Third Epistle of John, often shortened to 3 John", False)
     ]
 
     for sentence_str, expected in test_suite:
@@ -83,13 +82,31 @@ def test_sentence_has_context():
         ("In April 2001, while he was on parole", False),
         ("In 2006, Downey returned to television when he did voice acting on Family Guy in the episode \"The Fat Guy Strangler\".", True),
         ("Main articles: Robert Downey Jr. filmography and List of awards and nominations received by Robert Downey Jr.", False),
-        ("John may also refer to: ", True),
-        ("Third Epistle of John, often shortened to 3 John", True),
-        ("10 May 1758) was a German academic, librarian and lexicographer.", False)
+        ("John may also refer to: ", True)
     ]
 
     for sentence_str, expected in test_suite:
         sentence = nlp(sentence_str.lower())
         print(sentence_str)
         result = features.sentence_has_context(sentence)
+        assert expected == result
+
+def test_resolve_coreferences():
+    test_suite = [
+        (
+            """Carlos Orta was a dancer, choreographer and teacher with the José Limón Dance Company in New York since 1979. Mr. Orta was born in Caracas, Venezuela and trained at the Scola Cantorum in Paris. He also later studied with Pina Bausch at Germany's Folkwang Hochschule.
+
+He was the founder and director of the Corearte Dance Company of Venezuela, a dance troupe which performed his original moves, often based on Venezuelan folk dances.
+
+He won the International Academy of Dance's choreography award in Cologne, Germany, and Venezuela's Prize of Dance. Carlos Orta also taught at Long Island University and Manhattanville College.""",
+            """Carlos Orta was a dancer, choreographer and teacher with the José Limón Dance Company in New York since 1979. Mr. Orta was born in Caracas, Venezuela and trained at the Scola Cantorum in Paris. Carlos Orta also later studied with Pina Bausch at Germany's Folkwang Hochschule.
+
+Carlos Orta was the founder and director of the Corearte Dance Company of Venezuela, a dance troupe which performed his original moves, often based on Venezuelan folk dances.
+
+Carlos Orta won the International Academy of Dance's choreography award in Cologne, Germany, and Venezuela's Prize of Dance. Carlos Orta also taught at Long Island University and Manhattanville College.""")
+    ]
+
+    for sentence_str, expected in test_suite:
+        print(sentence_str)
+        result = features.resolve_coreferences(sentence_str)
         assert expected == result

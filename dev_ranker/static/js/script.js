@@ -10,6 +10,7 @@ get_next_trivia();
 
 function update_rank(rank){
     console.log('rank received: ', rank);
+    $('#trivia').text("loading next trivia...");
     socket.emit('update_rank', rank, () => get_next_trivia());
 }
 
