@@ -249,7 +249,7 @@ class DBConn:
         FROM user
         WHERE username = ?
         '''
-        password = db.cursor().execute(query, (username,)).fetchone()
+        password = db.cursor().execute(query, (username,)).fetchone()[0]
         db.close()
         return password
 
