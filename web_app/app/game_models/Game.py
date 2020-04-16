@@ -38,6 +38,7 @@ class Game:
         self.game_started = False
         self.current_trivia = ""
         self.number_of_responses = 0
+        self.number_of_lies = 0
         self.current_answer = ""
 
     def add_player_to_lobby(self, player: Player) -> bool:
@@ -136,7 +137,27 @@ class Game:
                 return [True, True]
             return [True, False]
 
+    def submit_lie(self, data: dict) -> list:
+        """Retrives a lie submitted by a player in a fibbage game.
+
+        :returns: A list, the first value corresponding to the success
+        of submitting lie, the second corresponding to the if there are more players left to submit lies
+
+        """
+        player = self.get_player_by_sid(data['sid'])
+        if player is None:
+            return [False, False]
+        player.current_lie = data['lie']
+        print("submitted lie:", data['lie'])
+        self.number_of_lies += 1
+        print("number of lies:", self.number_of_lies)
+        print('number of players:', self.num_players)
+        if self.number_of_lies == self.num_players:
+            return [True, True]
+        return [True, False]
+
     def get_trivia_answer_and_responses(self) -> dict:
+
         """Returns the answer to the current trivia, and the responses of each player
 
         :returns: a dictionary containing the trivia answer, and player answers

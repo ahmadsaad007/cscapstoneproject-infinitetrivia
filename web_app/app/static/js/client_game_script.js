@@ -90,26 +90,33 @@ function display_splash_screen(round_number){
 }
 
 
-function display_text_response_prompt(){
-
-    // const prompt = '<b>Answer:</b> <input id="text_answer">';
-    // const submit = '<button type="button" id="submit">Submit!</button>';
-    // $('#game_container').empty();
-    // $('#game_container').append(prompt);
-    // $('#game_container').append(submit);
-    // // connect button to submit event
+function display_text_response_prompt(mode){
+    console.log("displaying text response");
     const html = '<form class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here" required><input type="button" id="submit" value="submit"></form>';
-    // const html = '<h1>Enter your answer here</h1><div class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here"><input type="button" id="submit"></div>';
     $('#game_container').empty();
+    if (mode === "lie"){
+	$('#game_container').append("<h3>Submit your lie!</h3>");
+    }
     $('#game_container').append(html);
-    $('#submit').on('click', submit_text_answer);
+    $('#submit').on('click', function() {
+	if (mode === "answer"){
+	    submit_text_answer();
+	} else {
+	    submit_lie();
+	}
+    });
     $('#answer').keypress(event => {
 	var keycode = (event.keyCode ? event.keyCode : event.which);
 	if (keycode == '13'){ // enter button pressed
-	    submit_text_answer();
+	    if (mode === "answer"){
+		submit_text_answer();
+	    } else {
+		submit_lie();
+	    }
 	}
     });
 }
+
 
 function display_timeout_message(){
     // check if submit id still exits
@@ -144,11 +151,20 @@ function submit_trivia_rank(rank){
 function submit_text_answer(){
     let answer = $('#answer').val();
     console.log(answer);
-    // TODO: send answer over to server
     socket.emit('submit_answer', {code: code, answer: answer}, function(status){
 	submitted_answer(status);
     });
     // remove answer area
+}
+
+function submit_lie(){
+    let lie = $('#answer').val();
+    console.log("lie:", lie);
+    // TODO: send lie over to server
+    console.log("submitting lie");
+    socket.emit('submit_lie', {code: code, lie: lie}, function(status){
+	submitted_answer(status);
+    });
 }
 
 function submitted_answer(status){

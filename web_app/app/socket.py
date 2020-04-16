@@ -36,7 +36,8 @@ def join_game(data):
                     connected=True,
                     current_score=0,
                     is_registered=False,  # TODO
-                    current_answer="")
+                    current_answer="",
+                    current_lie="")
     game = games[code]
     if not game.add_player_to_lobby(player):
         print("error: could not join")
@@ -90,13 +91,13 @@ def request_trivia(code):
 @socketio.on('prompt_response')
 def prompt_response(code):
     print("prompting for response")
-    socketio.emit('display_text_response_prompt', room=code)
+    socketio.emit('display_text_response_prompt', "answer", room=code)
 
 
 @socketio.on('prompt_lie')
 def prompt_lie(code):
     print("prompting for lies")
-    socketio.emit('display_lie_response_prompt', room=code)
+    socketio.emit('display_text_response_prompt', "lie", room=code)
 
 
 @socketio.on('submit_answer')
@@ -109,6 +110,19 @@ def submit_answer(data):
     if return_val[1] is True:
         print('all players are in')
         socketio.emit('all_players_in', room=game.host_id)
+    return return_val[0]
+
+
+@socketio.on('submit_lie')
+def submit_lie(data):
+    code = data['code']
+    game = games[code]
+    print("got lie:", data['lie'])
+    data['sid'] = request.sid
+    return_val = game.submit_lie(data)
+    if return_val[1] is True:
+        print('all players have lied')
+        socketio.emit('all_lies_in', room=game.host_id)
     return return_val[0]
 
 

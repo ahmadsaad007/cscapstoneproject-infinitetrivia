@@ -21,6 +21,7 @@ class Player:
     name: str
     ID: str
     current_answer: str
+    current_lie: str
     connected: bool
     current_score: int
     is_registered: bool

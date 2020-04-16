@@ -119,7 +119,11 @@ function display_score(data){
 
 function request_trivia(){
     socket.emit('request_trivia', get_code(), function(trivia){
+	if (GAMEMODE === "fibbage"){
+	    present_trivia_fibbage(trivia);
+	} else {
 	    present_trivia(trivia);
+	}
     });
 }
 
@@ -130,6 +134,7 @@ function present_trivia(trivia){
     $('#room_container').append("<b>" + trivia + "</b>");
     $('#room_container').append("<br><br>");
     $('#room_container').append(time_board);
+    
     prompt_response();
     //countdown(question_timer).then(round_finish);
     worker = new Worker('static/js/timer.js');
@@ -145,7 +150,34 @@ function present_trivia(trivia){
 	    round_finish();
 	}
     };
+    
 }
+
+function present_trivia_fibbage(trivia){
+    console.log(trivia);
+    const time_board = '<h3><b id="count_number">30</b> seconds to enter lie</h3>';
+    $('#room_container').empty();
+    $('#room_container').append("<b>" + trivia + "</b>");
+    $('#room_container').append("<br><br>");
+    $('#room_container').append(time_board);
+
+    prompt_lie();
+    worker = new Worker('static/js/timer.js');
+    console.log('created worker!');
+    if (worker == undefined){
+	console.log('worker creation failed');
+    }
+    worker.onmessage = function(event) {
+	$('#count_number').text(event.data.toString());
+	if (event.data == 0 || all_players_in_flag){
+	    worker.terminate();
+	    worker = undefined;
+	    prompt_fibbage_response();
+	}
+    };    
+    
+}
+
 
 function prompt_lie(){
     console.log("prompting for lie");
@@ -156,12 +188,33 @@ function prompt_response(){
     socket.emit("prompt_response", get_code());
 }
 
+function prompt_fibbage_response(){
+    all_players_in_flag = false;
+    socket.emit("answer_timeout", get_code());
+    socket.emit("get_lies_and_answer", get_code(), function(data){
+	display_lies_and_answer(data);
+    });
+}
+
+
 function round_finish(){
     all_players_in_flag = false;
     socket.emit("answer_timeout", get_code());
     socket.emit("get_answers", get_code(), function(data){
 	    display_answer(data);
     });
+}
+
+function all_lies_in(){
+    all_players_in_flag = false;
+    socket.emit("answer_timeout", get_code());
+    socket.emit("get_lies_and_answer", get_code(), function(data){
+	display_lies_and_answer(data);
+    });
+}
+
+function display_lies_and_answer(data){
+    console.log("displaying lies and answer!");
 }
 
 function display_answer(data){
