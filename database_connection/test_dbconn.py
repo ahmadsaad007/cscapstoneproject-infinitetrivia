@@ -132,6 +132,11 @@ class TestDBConn(unittest.TestCase):
         act_user_id = DBConn(TestDBConn.DB_FILENAME).update_user(user)
         self.assertEqual(exp_user_id, act_user_id)
 
+    def test_select_password(self):
+        exp_password = 'pass1'
+        act_password = DBConn(TestDBConn.DB_FILENAME).select_password('Jill')
+        self.assertEqual(exp_password, act_password)
+
     def test_update_password(self):
         exp_username = 'Jill'
         exp_password = 'test'
