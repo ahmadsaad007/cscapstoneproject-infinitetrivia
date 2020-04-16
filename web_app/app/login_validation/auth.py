@@ -34,7 +34,6 @@ def login_handler():
     else:
         return login_post(request)
 
-
 @auth.route('/signup', methods=['POST'])
 def signup_post():
     email = request.form.get('email')
@@ -64,14 +63,11 @@ def login_post():
     username = request.form.get('username')
     password = request.form.get('password')
     
-    print(username, password)
     # TODO implement this?
     #remember = True if request.form.get('remember') else False
     remember = False
 
     user = DBConn().select_user(username)
-    if user is None:
-        print("User not found")
 
     if user is not None and check_password_hash(DBConn().select_password(user.username), password):
         print("Logging user", username, "in")
@@ -79,8 +75,6 @@ def login_post():
         session['username'] = user.username
         return redirect(url_for('index'))
     
-    print("Password A:", DBConn().select_password(user.username))
-    #print("Password B:", hash_pass)
     flash('Please check your login details and try again.')
     return redirect(url_for('login_page'))
     
