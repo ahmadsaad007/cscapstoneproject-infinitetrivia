@@ -1,6 +1,7 @@
 console.log("Create Room JS successfully loaded.");
 
 var socket = io.connect('http://' + document.domain + ":" + location.port);
+var GAMEMODE;
 var round_wait = 5;
 var question_timer = 30;
 var worker;
@@ -54,6 +55,7 @@ function get_game_options(){
         }
     }
     game_opts.mode = mode;
+    GAMEMODE = mode;
 
     return game_opts;
 }
@@ -143,6 +145,11 @@ function present_trivia(trivia){
 	    round_finish();
 	}
     };
+}
+
+function prompt_lie(){
+    console.log("prompting for lie");
+    socket.emit("prompt_lie", get_code());
 }
 
 function prompt_response(){

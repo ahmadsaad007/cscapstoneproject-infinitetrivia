@@ -1,6 +1,7 @@
 from app import socketio, games
 from app.game_models.Game import Game
 from app.game_models.Player import Player
+from app.game_models.GameSettings import GameSettings
 from app.validations import is_game_code_valid
 from app.validations import is_game_name_valid
 from flask import request
@@ -11,8 +12,10 @@ from flask_socketio import join_room
 def create_game(game_options):
     # TODO: potentially create game code server side instead of client side?
     code = game_options['code']
+    # create game mode object
+    settings = GameSettings(game_options['code'])
     # create new Game object and add to game dict
-    game = Game(code, None, request.sid)
+    game = Game(code, settings, request.sid)
     games[code] = game
     return game_options['code']
 
@@ -88,6 +91,12 @@ def request_trivia(code):
 def prompt_response(code):
     print("prompting for response")
     socketio.emit('display_text_response_prompt', room=code)
+
+
+@socketio.on('prompt_lie')
+def prompt_lie(code):
+    print("prompting for lies")
+    socketio.emit('display_lie_response_prompt', room=code)
 
 
 @socketio.on('submit_answer')
