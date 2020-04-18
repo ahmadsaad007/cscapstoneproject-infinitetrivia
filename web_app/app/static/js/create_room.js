@@ -213,7 +213,9 @@ function prompt_fibbage_response(){
 	    if (event.data == 0 || all_players_in_flag){
 		worker.terminate();
 		worker = undefined;
-		// todo display fibbage fibbage answer
+		socket.emit('get_fibbage_answer_and_responses',
+			    get_code(),
+			    data => display_fibbage_answer(data));
 	    }
 	};
     });
@@ -254,6 +256,13 @@ function display_answer(data){
             display_score(data);
 	});
     });
+}
+
+function display_fibbage_answer(data){
+    const answer = '<h3>' + 'Answer: ' + data['answer'] + '</h3>';
+    $('#room_container').empty();
+    $('#room_container').append(answer);
+    
 }
 
 async function countdown(seconds){

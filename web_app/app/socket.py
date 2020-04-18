@@ -155,11 +155,11 @@ def get_answers(code):
     return data
 
 
-@socketio.on('get_lies_and_answer')
+@socketio.on('get_fibbage_answer_and_responses')
 def get_lies_and_answer(code):
     print("got request for fibbage lies and answer")
     game = games[code]
-    data = game.get_fibbage_lies_and_answer()
+    data = game.get_fibbage_lies_and_answer()  # TODO
     return data
 
 
