@@ -27,6 +27,11 @@ socket.on('all_players_in', () => {
     all_players_in_flag = true;
 });
 
+socket.on('all_lies_in', () => {
+    console.log('all lies in!');
+    all_players_in_flag = true;
+});
+
 function create_room(){
     let game_options = get_game_options();
     let code = create_room_code();
@@ -155,7 +160,7 @@ function present_trivia(trivia){
 
 function present_trivia_fibbage(trivia){
     console.log(trivia);
-    const time_board = '<h3><b id="count_number">30</b> seconds to enter lie</h3>';
+    const time_board = '<h3 id="counter"><b id="count_number">30</b> seconds to enter lie</h3>';
     $('#room_container').empty();
     $('#room_container').append("<b>" + trivia + "</b>");
     $('#room_container').append("<br><br>");
@@ -189,10 +194,28 @@ function prompt_response(){
 }
 
 function prompt_fibbage_response(){
+    const time_board = '<h3><b id="count_number">30</b> seconds to answer</h3>';
     all_players_in_flag = false;
     socket.emit("answer_timeout", get_code());
-    socket.emit("get_lies_and_answer", get_code(), function(data){
-	display_lies_and_answer(data);
+    $('#counter').remove(); // remove lie counter
+    $('#room_container').append('<h3 id="all_lies_in">All lies in!</h3>');
+
+    countdown(5).then(function() {
+	$('#all_lies_in').remove();
+	$('#room_container').append(time_board);
+	socket.emit("prompt_fibbage_response", get_code());
+	worker = new Worker('static/js/timer.js');
+	if (worker == undefined){
+	    console.log('worker creation failed');
+	}
+	worker.onmessage = function(event) {
+	    $('#count_number').text(event.data.toString());
+	    if (event.data == 0 || all_players_in_flag){
+		worker.terminate();
+		worker = undefined;
+		// todo display fibbage fibbage answer
+	    }
+	};
     });
 }
 
@@ -205,17 +228,6 @@ function round_finish(){
     });
 }
 
-function all_lies_in(){
-    all_players_in_flag = false;
-    socket.emit("answer_timeout", get_code());
-    socket.emit("get_lies_and_answer", get_code(), function(data){
-	display_lies_and_answer(data);
-    });
-}
-
-function display_lies_and_answer(data){
-    console.log("displaying lies and answer!");
-}
 
 function display_answer(data){
     const trivia_answer = '<h3>Answer: ' + data['answer'] + '</h3>';

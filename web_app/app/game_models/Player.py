@@ -24,6 +24,7 @@ class Player:
     current_lie: str
     connected: bool
     current_score: int
+    number_fooled: int
     is_registered: bool
 
     def get_name(self) -> str:

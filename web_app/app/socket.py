@@ -1,3 +1,5 @@
+import random
+
 from app import socketio, games
 from app.game_models.Game import Game
 from app.game_models.Player import Player
@@ -35,6 +37,7 @@ def join_game(data):
                     ID=request.sid,
                     connected=True,
                     current_score=0,
+                    number_fooled=0,
                     is_registered=False,  # TODO
                     current_answer="",
                     current_lie="")
@@ -94,6 +97,17 @@ def prompt_response(code):
     socketio.emit('display_text_response_prompt', "answer", room=code)
 
 
+@socketio.on('prompt_fibbage_response')
+def prompt_fibbage_response(code):
+    print("prompting for fibbage response")
+    game = games[code]
+    data = game.get_fibbage_lies_and_answer()
+    answer_list = data['lies']
+    answer_list.append(data['answer'])
+    random.shuffle(answer_list)
+    socketio.emit('display_fibbage_response_prompt', answer_list, room=code)
+
+
 @socketio.on('prompt_lie')
 def prompt_lie(code):
     print("prompting for lies")
@@ -138,6 +152,14 @@ def get_answers(code):
     data = game.get_trivia_answer_and_responses()
     # prompt users for trivia rank once answer is displayed
     socketio.emit('prompt_trivia_rank', room=code)
+    return data
+
+
+@socketio.on('get_lies_and_answer')
+def get_lies_and_answer(code):
+    print("got request for fibbage lies and answer")
+    game = games[code]
+    data = game.get_fibbage_lies_and_answer()
     return data
 
 

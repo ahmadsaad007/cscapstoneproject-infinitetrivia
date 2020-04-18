@@ -7,6 +7,7 @@ socket.on('display_splash_screen', function(round_number){
     display_splash_screen(round_number);
 });
 socket.on('display_text_response_prompt', display_text_response_prompt);
+socket.on('display_fibbage_response_prompt', display_fibbage_response_prompt);
 socket.on('answer_timeout', display_timeout_message);
 socket.on('prompt_trivia_rank', display_trivia_rank_prompt);
 
@@ -14,6 +15,7 @@ var code = undefined;
 
 function swap_style_sheet(){
     $('#page_style').attr('href', '/static/css/answer_page.css');
+    $('head').append('<link id="page_style2" rel="stylesheet" href="/static/css/fibbage_mode.css">');
 }
 
 function join_game(){
@@ -117,6 +119,35 @@ function display_text_response_prompt(mode){
     });
 }
 
+function display_fibbage_response_prompt(lies){
+    const title = '<h3>Submit Your Resonse!</h3>';
+    const fib_body = '<min id="fibbage_body" class="fibbage__body"></min>';
+    const ans_button_open = '<button class="fibbage__button" id=';
+    const ans_button_close = '</button>';
+    const ans_text_open = '<span class="fibbage__button__text">';
+    const ans_text_close = '</span>';
+    console.log("displaying fibbage resonse");
+    $('#game_container').empty();
+    $('#game_container').append('<h3>Submit Fibbage Lie Here:</h3>');
+    $('#game_container').append(fib_body);
+    console.log(lies);
+    let i = 0;
+    for (const lie of lies){
+	$('#fibbage_body').append(ans_button_open
+				  + '"submit_button_' + i +'">'
+				  + ans_text_open
+				  + lie
+				  + ans_text_close
+				  + ans_button_close);
+	$('#submit_button_' + i).on('click', function(){
+	    submit_fibbage_answer(lie);
+	});
+	i++;
+    }
+    
+    console.log("added all answers to set!");
+}
+
 
 function display_timeout_message(){
     // check if submit id still exits
@@ -155,6 +186,13 @@ function submit_text_answer(){
 	submitted_answer(status);
     });
     // remove answer area
+}
+
+function submit_fibbage_answer(answer){
+    console.log('submit answer: ', answer);
+    socket.emit('submit_answer', {code: code, answer: answer}, function(status){
+	submitted_answer(status);
+    });
 }
 
 function submit_lie(){
