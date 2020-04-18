@@ -196,10 +196,12 @@ class Game:
                               for p in self.players
                               if p.current_answer == player.current_lie])
             player_info['fooled'] = num_fooled
+            player.number_fooled = num_fooled
             data['players'].append(player_info)
         self.round_number += 1
         # self.update_fibbage_scores(data) TODO
         self.number_of_responses = 0
+        self.update_fibbage_scores(data)
         return data
 
     def get_fibbage_lies_and_answer(self) -> dict:
@@ -220,7 +222,15 @@ class Game:
 
     def update_fibbage_scores(self, data):
         """Updates the scores of each player based on the answer and lies of each player"""
-        pass
+        for player in self.players:
+            if data['answer'] == player.current_answer:
+                player.update_score(1)
+            player.update_score(player.number_fooled)
+            player.number_fooled = 0
+            player.current_lie = ""
+            player.current_answer = ""
+        self.number_of_lies = 0
+
 
     def update_scores(self, data):
         """Updates the scores of each player based on the data of each player."""

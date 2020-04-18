@@ -122,6 +122,7 @@ function display_score(data){
     countdown(round_wait).then(request_trivia);
 }
 
+
 function request_trivia(){
     socket.emit('request_trivia', get_code(), function(trivia){
 	if (GAMEMODE === "fibbage"){
@@ -260,14 +261,41 @@ function display_answer(data){
 
 function display_fibbage_answer(data){
     socket.emit("answer_timeout", get_code());
+    all_players_in_flag = false;
     const answer = '<h3>' + 'Answer: ' + data['answer'] + '</h3>';
     const timeout = '<h3 id="timeout_msg">' + 'Time is up!' + '</h3>';
+    const score_board = "<ul id=score_board/>";
     $('#counter').remove();
     $('#room_container').append(timeout);
     countdown(5).then( function(){
 	$('#timeout_msg').remove();
 	$('#room_container').append(answer);
-	// TODO display score 
+	$('#room_container').append('<br><br>');
+	$('#room_container').append(score_board);
+	for (const player of data['players']){
+	    let player_list_item = '<li id="' + player['name'] + '_item">' + player['name'] +'</li>';
+	    $("#score_board").append(player_list_item);
+	    let player_sublist = '<ul id="' + player['name'] + '_list">' + '</ul>';
+	    $('#' + player['name'] + '_item').append(player_sublist);
+	    let sublist_id = player['name'] + '_list';
+	    $('#' + sublist_id).append('<li>Answer: '
+				       + player['answer']
+				       + ' (+ '
+				       + (player['correct'] ? '1' : '0')
+				       + ')'
+      				       + '</li>');
+	    $('#' + sublist_id).append('<li>Lie: '
+				       + player['lie']
+				       + ' (+ '
+				       + player['fooled']
+				       + ')'
+      				       + '</li>');
+	}
+	countdown(7).then( function(){
+            socket.emit('request_scores', get_code(), function(scores){
+		display_score(scores);
+	    });
+	});
     });
     console.log(data);
 }
