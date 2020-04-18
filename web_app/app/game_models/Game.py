@@ -103,11 +103,10 @@ class Game:
         :returns: a trivia question
         """
         quest_ans_pairs = []
-        print('searching for trivia!')
         while not quest_ans_pairs:
             trivia_article = get_page_by_random()
             tunit_list = create_TUnits(trivia_article)
-            if tunit_list:
+            if len(tunit_list) > 0:
                 tunit = random.choice(tunit_list)
                 quest_ans_pairs = nlp_question_generation(tunit.sentence)
         trivia_question, trivia_answer = random.choice(quest_ans_pairs)

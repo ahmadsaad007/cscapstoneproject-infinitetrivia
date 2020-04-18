@@ -7,12 +7,14 @@ import random
 import sqlite3
 import os
 
+from trivia_generator import TUnit
+from flask_login import UserMixin
 from trivia_generator.TUnit import TUnit
 from typing import Optional
 
 
 @dataclass
-class DBUser:
+class DBUser(UserMixin):
     user_id: int = None
     username: str = None
     email: str = None
@@ -231,6 +233,25 @@ class DBConn:
             return -1
         else:
             return user_id[0]
+
+    def select_password(self, username: str) -> str:
+        """
+        Retrieves a password entry from the database for the specified user
+
+        :param username: user's username
+        :type username: str
+        :raises: sqlite3.DatabaseError
+        :return: password entry
+        """
+        db = sqlite3.connect(self.db_filename)
+        query = '''
+        SELECT password
+        FROM user
+        WHERE username = ?
+        '''
+        password = db.cursor().execute(query, (username,)).fetchone()[0]
+        db.close()
+        return password
 
     def update_password(self, username: str, password: str) -> int:
         """ Updates a user in the database.
