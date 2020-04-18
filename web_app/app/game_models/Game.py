@@ -177,6 +177,31 @@ class Game:
         self.number_of_responses = 0
         return data
 
+    def get_fibbage_answer_and_responses(self) -> dict:
+        """Returns the answer to the current trivia, and the lies+answers of each player
+
+        :returns: a dictionary containing the trivia answer, and the lie and answer of each player
+        """
+        data = dict()
+        data['answer'] = self.current_answer
+        data['players'] = []
+        for player in self.players:
+            player_info = dict()
+            player_info['name'] = player.name
+            player_info['answer'] = player.current_answer
+            is_correct = (player.current_answer == self.current_answer)
+            player_info['correct'] = is_correct
+            player_info['lie'] = player.current_lie
+            num_fooled = len([p.current_answer
+                              for p in self.players
+                              if p.current_answer == player.current_lie])
+            player_info['fooled'] = num_fooled
+            data['players'].append(player_info)
+        self.round_number += 1
+        # self.update_fibbage_scores(data) TODO
+        self.number_of_responses = 0
+        return data
+
     def get_fibbage_lies_and_answer(self) -> dict:
         """Returns all user-submitted lies to current fibbage trivia, and real answer 
 

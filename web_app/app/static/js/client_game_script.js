@@ -151,7 +151,7 @@ function display_fibbage_response_prompt(lies){
 
 function display_timeout_message(){
     // check if submit id still exits
-    if ($('#submit').length){
+    if ($('#submit').length || $('#fibbage_body').length){
 	$('#game_container').empty();
 	$('#game_container').append("<h3>Time is up!</h3>");
     }

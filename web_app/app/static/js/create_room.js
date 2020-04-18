@@ -134,7 +134,7 @@ function request_trivia(){
 
 function present_trivia(trivia){
     console.log(trivia);
-    const time_board = '<h3><b id="count_number">30</b> seconds to answer</h3>';
+    const time_board = '<h3 id="counter"><b id="count_number">30</b> seconds to answer</h3>';
     $('#room_container').empty();
     $('#room_container').append("<b>" + trivia + "</b>");
     $('#room_container').append("<br><br>");
@@ -194,7 +194,7 @@ function prompt_response(){
 }
 
 function prompt_fibbage_response(){
-    const time_board = '<h3><b id="count_number">30</b> seconds to answer</h3>';
+    const time_board = '<h3 id="counter"><b id="count_number">30</b> seconds to answer</h3>';
     all_players_in_flag = false;
     socket.emit("answer_timeout", get_code());
     $('#counter').remove(); // remove lie counter
@@ -259,10 +259,17 @@ function display_answer(data){
 }
 
 function display_fibbage_answer(data){
+    socket.emit("answer_timeout", get_code());
     const answer = '<h3>' + 'Answer: ' + data['answer'] + '</h3>';
-    $('#room_container').empty();
-    $('#room_container').append(answer);
-    
+    const timeout = '<h3 id="timeout_msg">' + 'Time is up!' + '</h3>';
+    $('#counter').remove();
+    $('#room_container').append(timeout);
+    countdown(5).then( function(){
+	$('#timeout_msg').remove();
+	$('#room_container').append(answer);
+	// TODO display score 
+    });
+    console.log(data);
 }
 
 async function countdown(seconds){
