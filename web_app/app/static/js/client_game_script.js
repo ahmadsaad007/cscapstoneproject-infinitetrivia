@@ -7,6 +7,7 @@ socket.on('display_splash_screen', function(round_number){
     display_splash_screen(round_number);
 });
 socket.on('display_text_response_prompt', display_text_response_prompt);
+socket.on('display_fibbage_response_prompt', display_fibbage_response_prompt);
 socket.on('answer_timeout', display_timeout_message);
 socket.on('prompt_trivia_rank', display_trivia_rank_prompt);
 
@@ -14,6 +15,7 @@ var code = undefined;
 
 function swap_style_sheet(){
     $('#page_style').attr('href', '/static/css/answer_page.css');
+    $('head').append('<link id="page_style2" rel="stylesheet" href="/static/css/fibbage_mode.css">');
 }
 
 function join_game(){
@@ -90,30 +92,66 @@ function display_splash_screen(round_number){
 }
 
 
-function display_text_response_prompt(){
-
-    // const prompt = '<b>Answer:</b> <input id="text_answer">';
-    // const submit = '<button type="button" id="submit">Submit!</button>';
-    // $('#game_container').empty();
-    // $('#game_container').append(prompt);
-    // $('#game_container').append(submit);
-    // // connect button to submit event
+function display_text_response_prompt(mode){
+    console.log("displaying text response");
     const html = '<form class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here" required><input type="button" id="submit" value="submit"></form>';
-    // const html = '<h1>Enter your answer here</h1><div class="form-wrapper"><input type="text" id="answer" placeholder="Type answer here"><input type="button" id="submit"></div>';
     $('#game_container').empty();
+    if (mode === "lie"){
+	$('#game_container').append("<h3>Submit your lie!</h3>");
+    }
     $('#game_container').append(html);
-    $('#submit').on('click', submit_text_answer);
+    $('#submit').on('click', function() {
+	if (mode === "answer"){
+	    submit_text_answer();
+	} else {
+	    submit_lie();
+	}
+    });
     $('#answer').keypress(event => {
 	var keycode = (event.keyCode ? event.keyCode : event.which);
 	if (keycode == '13'){ // enter button pressed
-	    submit_text_answer();
+	    if (mode === "answer"){
+		submit_text_answer();
+	    } else {
+		submit_lie();
+	    }
 	}
     });
 }
 
+function display_fibbage_response_prompt(lies){
+    const title = '<h3>Submit Your Resonse!</h3>';
+    const fib_body = '<min id="fibbage_body" class="fibbage__body"></min>';
+    const ans_button_open = '<button class="fibbage__button" id=';
+    const ans_button_close = '</button>';
+    const ans_text_open = '<span class="fibbage__button__text">';
+    const ans_text_close = '</span>';
+    console.log("displaying fibbage resonse");
+    $('#game_container').empty();
+    $('#game_container').append('<h3>Submit Fibbage Lie Here:</h3>');
+    $('#game_container').append(fib_body);
+    console.log(lies);
+    let i = 0;
+    for (const lie of lies){
+	$('#fibbage_body').append(ans_button_open
+				  + '"submit_button_' + i +'">'
+				  + ans_text_open
+				  + lie
+				  + ans_text_close
+				  + ans_button_close);
+	$('#submit_button_' + i).on('click', function(){
+	    submit_fibbage_answer(lie);
+	});
+	i++;
+    }
+    
+    console.log("added all answers to set!");
+}
+
+
 function display_timeout_message(){
     // check if submit id still exits
-    if ($('#submit').length){
+    if ($('#submit').length || $('#fibbage_body').length){
 	$('#game_container').empty();
 	$('#game_container').append("<h3>Time is up!</h3>");
     }
@@ -144,11 +182,27 @@ function submit_trivia_rank(rank){
 function submit_text_answer(){
     let answer = $('#answer').val();
     console.log(answer);
-    // TODO: send answer over to server
     socket.emit('submit_answer', {code: code, answer: answer}, function(status){
 	submitted_answer(status);
     });
     // remove answer area
+}
+
+function submit_fibbage_answer(answer){
+    console.log('submit answer: ', answer);
+    socket.emit('submit_answer', {code: code, answer: answer}, function(status){
+	submitted_answer(status);
+    });
+}
+
+function submit_lie(){
+    let lie = $('#answer').val();
+    console.log("lie:", lie);
+    // TODO: send lie over to server
+    console.log("submitting lie");
+    socket.emit('submit_lie', {code: code, lie: lie}, function(status){
+	submitted_answer(status);
+    });
 }
 
 function submitted_answer(status){

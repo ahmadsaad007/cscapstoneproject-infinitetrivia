@@ -1,6 +1,7 @@
 console.log("Create Room JS successfully loaded.");
 
 var socket = io.connect('http://' + document.domain + ":" + location.port);
+var GAMEMODE;
 var round_wait = 5;
 var question_timer = 30;
 var worker;
@@ -23,6 +24,11 @@ socket.on('remove_player_from_lobby', (name) => {
 
 socket.on('all_players_in', () => {
     console.log('all players in!');
+    all_players_in_flag = true;
+});
+
+socket.on('all_lies_in', () => {
+    console.log('all lies in!');
     all_players_in_flag = true;
 });
 
@@ -54,6 +60,7 @@ function get_game_options(){
         }
     }
     game_opts.mode = mode;
+    GAMEMODE = mode;
 
     return game_opts;
 }
@@ -115,19 +122,25 @@ function display_score(data){
     countdown(round_wait).then(request_trivia);
 }
 
+
 function request_trivia(){
     socket.emit('request_trivia', get_code(), function(trivia){
+	if (GAMEMODE === "fibbage"){
+	    present_trivia_fibbage(trivia);
+	} else {
 	    present_trivia(trivia);
+	}
     });
 }
 
 function present_trivia(trivia){
     console.log(trivia);
-    const time_board = '<h3><b id="count_number">30</b> seconds to answer</h3>';
+    const time_board = '<h3 id="counter"><b id="count_number">30</b> seconds to answer</h3>';
     $('#room_container').empty();
     $('#room_container').append("<b>" + trivia + "</b>");
     $('#room_container').append("<br><br>");
     $('#room_container').append(time_board);
+    
     prompt_response();
     //countdown(question_timer).then(round_finish);
     worker = new Worker('static/js/timer.js');
@@ -143,11 +156,72 @@ function present_trivia(trivia){
 	    round_finish();
 	}
     };
+    
+}
+
+function present_trivia_fibbage(trivia){
+    console.log(trivia);
+    const time_board = '<h3 id="counter"><b id="count_number">30</b> seconds to enter lie</h3>';
+    $('#room_container').empty();
+    $('#room_container').append("<b>" + trivia + "</b>");
+    $('#room_container').append("<br><br>");
+    $('#room_container').append(time_board);
+
+    prompt_lie();
+    worker = new Worker('static/js/timer.js');
+    console.log('created worker!');
+    if (worker == undefined){
+	console.log('worker creation failed');
+    }
+    worker.onmessage = function(event) {
+	$('#count_number').text(event.data.toString());
+	if (event.data == 0 || all_players_in_flag){
+	    worker.terminate();
+	    worker = undefined;
+	    prompt_fibbage_response();
+	}
+    };    
+    
+}
+
+
+function prompt_lie(){
+    console.log("prompting for lie");
+    socket.emit("prompt_lie", get_code());
 }
 
 function prompt_response(){
     socket.emit("prompt_response", get_code());
 }
+
+function prompt_fibbage_response(){
+    const time_board = '<h3 id="counter"><b id="count_number">30</b> seconds to answer</h3>';
+    all_players_in_flag = false;
+    socket.emit("answer_timeout", get_code());
+    $('#counter').remove(); // remove lie counter
+    $('#room_container').append('<h3 id="all_lies_in">All lies in!</h3>');
+
+    countdown(5).then(function() {
+	$('#all_lies_in').remove();
+	$('#room_container').append(time_board);
+	socket.emit("prompt_fibbage_response", get_code());
+	worker = new Worker('static/js/timer.js');
+	if (worker == undefined){
+	    console.log('worker creation failed');
+	}
+	worker.onmessage = function(event) {
+	    $('#count_number').text(event.data.toString());
+	    if (event.data == 0 || all_players_in_flag){
+		worker.terminate();
+		worker = undefined;
+		socket.emit('get_fibbage_answer_and_responses',
+			    get_code(),
+			    data => display_fibbage_answer(data));
+	    }
+	};
+    });
+}
+
 
 function round_finish(){
     all_players_in_flag = false;
@@ -156,6 +230,7 @@ function round_finish(){
 	    display_answer(data);
     });
 }
+
 
 function display_answer(data){
     const trivia_answer = '<h3>Answer: ' + data['answer'] + '</h3>';
@@ -182,6 +257,47 @@ function display_answer(data){
             display_score(data);
 	});
     });
+}
+
+function display_fibbage_answer(data){
+    socket.emit("answer_timeout", get_code());
+    all_players_in_flag = false;
+    const answer = '<h3>' + 'Answer: ' + data['answer'] + '</h3>';
+    const timeout = '<h3 id="timeout_msg">' + 'Time is up!' + '</h3>';
+    const score_board = "<ul id=score_board/>";
+    $('#counter').remove();
+    $('#room_container').append(timeout);
+    countdown(5).then( function(){
+	$('#timeout_msg').remove();
+	$('#room_container').append(answer);
+	$('#room_container').append('<br><br>');
+	$('#room_container').append(score_board);
+	for (const player of data['players']){
+	    let player_list_item = '<li id="' + player['name'] + '_item">' + player['name'] +'</li>';
+	    $("#score_board").append(player_list_item);
+	    let player_sublist = '<ul id="' + player['name'] + '_list">' + '</ul>';
+	    $('#' + player['name'] + '_item').append(player_sublist);
+	    let sublist_id = player['name'] + '_list';
+	    $('#' + sublist_id).append('<li>Answer: '
+				       + player['answer']
+				       + ' (+ '
+				       + (player['correct'] ? '1' : '0')
+				       + ')'
+      				       + '</li>');
+	    $('#' + sublist_id).append('<li>Lie: '
+				       + player['lie']
+				       + ' (+ '
+				       + player['fooled']
+				       + ')'
+      				       + '</li>');
+	}
+	countdown(7).then( function(){
+            socket.emit('request_scores', get_code(), function(scores){
+		display_score(scores);
+	    });
+	});
+    });
+    console.log(data);
 }
 
 async function countdown(seconds){
