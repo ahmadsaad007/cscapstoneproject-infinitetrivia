@@ -10,7 +10,7 @@ from trivia_generator.TUnit import TUnit
 
 class TestDBConn(unittest.TestCase):
     DB_FILENAME = 'test.db'
-    SEARCH_RADIUS = 50
+    SEARCH_RADIUS = 15.0
     SCHEMA_FILENAME = 'test_sql/test_schema.sql'
     DATA_FILENAME = 'test_sql/test_data.sql'
     REMOVE_DATA_FILENAME = 'test_sql/test_remove_data.sql'
@@ -226,14 +226,17 @@ class TestDBConn(unittest.TestCase):
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_select_tunit_location_exists(self):
-        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30, 30, 0, 0, 0),
-                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.25, 30.25, 1, 1, 1)]
-        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location(30.1, 30.1)
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30.0, 30.0, 0, 0, 0),
+                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1)]
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location(30.0, 30.0)
+        self.assertEqual(exp_t_unit_list, act_t_unit_list)
+        exp_t_unit_list = [TUnit('sentence_c', 3, 'url', 1234, 3, -1, 30.0, 2, 2, 2)]
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location(-1.0, 30.0)
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_select_tunit_location_does_not_exist(self):
         exp_t_unit_list = []
-        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_location(0,0)
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location(10, 10)
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_delete_tunit(self):
@@ -272,8 +275,12 @@ class TestDBConn(unittest.TestCase):
 
     def test_select_articles_location_positive(self):
         exp_articles = [(1, 'a'), (2, 'b')]
-        location = (30.1, 30.1)
-        act_articles = DBConn(TestDBConn.DB_FILENAME).select_articles_location(*location)
+        location = (30.0, 30.0)
+        act_articles = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_articles_location(*location)
+        self.assertEqual(exp_articles, act_articles)
+        exp_articles = [(3, 'c')]
+        location = (-1, 30.0)
+        act_articles = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_articles_location(*location)
         self.assertEqual(exp_articles, act_articles)
 
     def test_select_articles_location_negative(self):

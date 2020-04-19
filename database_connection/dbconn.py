@@ -255,7 +255,7 @@ class DBConn:
         :raises: sqlite3.DatabaseError
         :return: password entry
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         query = '''
         SELECT password
         FROM user
@@ -415,12 +415,22 @@ class DBConn:
         db = connect(self.db_filename)
         db.create_function('DISTANCE', 4, DBConn._distance)
         cursor = db.cursor()
+        # query = '''
+        #         SELECT t_unit_Id, DISTANCE(lat, long, ?, ?) d
+        #         FROM t_unit
+        #         WHERE d < 100
+        #         '''
         query = '''
-                SELECT t_unit_Id, lat, long, DISTANCE(lat, long, ?, ?) d
-                FROM t_unit
-                WHERE d < ?
+                SELECT sentence, article_id, url, access_timestamp, tu.t_unit_Id, lat, long, num_likes, num_mehs,
+                    num_dislikes
+                FROM t_unit tu
+                JOIN (
+                    SELECT t_unit_Id, DISTANCE(lat, long, ?, ?) d
+                    FROM t_unit
+                    WHERE d < ?
+                ) l ON tu.t_unit_Id = l.t_unit_Id
                 '''
-        cursor.execute(query, (lat, lat, long, long, DBConn.search_radius))
+        cursor.execute(query, (lat, long, self.search_radius))
         t_unit_list = [TUnit(*t_unit_tuple) for t_unit_tuple in cursor.fetchall()]
         db.close()
         return t_unit_list
@@ -494,15 +504,18 @@ class DBConn:
         :rtype: [(int, str)]
         """
         db = connect(self.db_filename)
+        db.create_function('DISTANCE', 4, DBConn._distance)
         cursor = db.cursor()
         query = """
-                SELECT a.article_id, title
+                SELECT a.article_id, a.title
                 FROM article a
-                JOIN t_unit tu on a.article_id = tu.article_id
-                WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5 AND
-                tu.long > ? - 0.5 AND tu.long < ? + 0.5
+                JOIN (
+                    SELECT article_id, DISTANCE(lat, long, ?, ?) d
+                    FROM t_unit
+                    WHERE d < ?
+                ) l ON a.article_id = l.article_id
                 """
-        cursor.execute(query, (lat, lat, long, long))
+        cursor.execute(query, (lat, lat, self.search_radius))
         article_list = cursor.fetchall()
         db.close()
         return article_list

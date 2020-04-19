@@ -27,9 +27,8 @@ VALUES (1, 'Jill', 'jill@email.com', 'pass1', 5, 5, 10, 5),
        (2, 'Jack', 'jack@email.com', 'pass2', 7, 7, 14, 7);
 
 INSERT INTO t_unit
-VALUES (1, 1, 'sentence_a', 'url', 1234, 30, 30, 0, 0, 0),
-       (2, 2, 'sentence_b', 'url', 1234, 30.25, 30.25, 1, 1, 1),
-       (3, 3, 'sentence_c', 'url', 1234, -30, 30, 2, 2, 2),
-       (4, 4, 'sentence_d', 'url', 1234, 0, 0, 3, 3, 3),
-       (5, 5, 'sentence_d', 'url', 1234, 85, 0, 3, 3, 3);
+VALUES (1, 1, 'sentence_a', 'url', 1234, 30.0, 30.0, 0, 0, 0),
+       (2, 2, 'sentence_b', 'url', 1234, 30.0, 30.25, 1, 1, 1),
+       (3, 3, 'sentence_c', 'url', 1234, -1.0, 30.0, 2, 2, 2),
+       (4, 4, 'sentence_d', 'url', 1234, -1.0, 30.25, 3, 3, 3);
 
