@@ -22,7 +22,6 @@ def trivia_classifier():
     
     dataX = np.array(listAttrs)
     dataY = np.array(listClasses)
-    print(len(listAttrs[0]))
     
     #train test split
     X_train, X_test, y_train, y_test = train_test_split(dataX, dataY, test_size=0.30, random_state=42)
