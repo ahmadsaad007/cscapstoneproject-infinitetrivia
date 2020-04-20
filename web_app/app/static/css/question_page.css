@@ -51,15 +51,27 @@ h2 {
   margin-left: 140px;
 }
 
-ul {
-    display: block;
-    margin: 0 auto;
+ul{
+  margin:30px auto 60px;
+  max-width:300px;
 }
 
 li {
-    margin: 0 auto;
-    font-weight: normal;
-    text-align: center;
+  margin: 0 auto;
+  font-weight: normal;
+  text-align: center;
+}
+
+#sublist{
+  background:#505662;
+  border-left:8px solid #1F2024;
+  color:#B6BCCC;
+  font-weight:600;
+  padding:15px;
+  position:relative;
+  text-align:left;
+  text-transform:uppercase;
+  transition: all .5s;
 }
 
 
@@ -81,7 +93,7 @@ li {
 
 h1, h2 {
   margin-bottom: 1em;
-  border-bottom: 2px solid #eee;.
+  border-bottom: 2px solid #eee;
   line-height: 1.5;
 }
 
@@ -109,7 +121,7 @@ h1 > small{
   background-image: -moz-linear-gradient(top#b4c5cf, #141a1d 100%);
   background-image: -ms-linear-gradient(top,#b4c5cf,  #141a1d 100%);
   background-image: -o-linear-gradient(top,#b4c5cf, #141a1d 100%);
-  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0,,#b4c5cf),color-stop(100%,   #141a1d));
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0,#b4c5cf),color-stop(100%,   #141a1d));
   background-image: -webkit-linear-gradient(top,#b4c5cf, #141a1d 100%);
   background-image: linear-gradient(to bottom,#b4c5cf, #141a1d 100%);
   text-shadow: 1px 1px 0 rgba(0, 0, 0, .6);
