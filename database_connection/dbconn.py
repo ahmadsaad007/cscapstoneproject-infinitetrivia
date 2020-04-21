@@ -73,6 +73,7 @@ class DBConn:
                 """
         cursor.execute(query, (zip_code,))
         lat_long = cursor.fetchone()
+        db.close()
         return lat_long if lat_long is not None else (None, None)
 
     def select_max_importance(self) -> float:
