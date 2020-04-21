@@ -3,7 +3,7 @@ Database Connection
 ===================
 """
 from dataclasses import dataclass
-from math import cos, sin, acos, radians
+from math import cos, sin, asin, radians, sqrt
 from random import random
 from sqlite3 import connect
 from os import path
@@ -50,13 +50,23 @@ class DBConn:
 
     @staticmethod
     def _distance(lat: float, long: float, query_lat: float, query_long: float):
-        return 3960 * acos(
-            cos(radians(query_lat)) *
-            cos(radians(lat)) *
-            cos(radians(long) - radians(query_long)) +
-            sin(radians(query_lat)) *
-            sin(radians(lat))
-        )
+        lat = radians(lat)
+        long = radians(long)
+        query_lat = radians(query_lat)
+        query_long = radians(query_long)
+        d_lon = query_long - long
+        d_lat = query_lat - lat
+        a = sin(d_lat / 2)**2 + cos(lat) * cos(query_lat) * sin(d_lon / 2)**2
+        c = 2 * asin(sqrt(a))
+        r = 3956
+        return c * r
+        # return 3960 * acos(
+        #     cos(radians(query_lat)) *
+        #     cos(radians(lat)) *
+        #     cos(radians(long) - radians(query_long)) +
+        #     sin(radians(query_lat)) *
+        #     sin(radians(lat))
+        # )
 
     def select_max_importance(self) -> float:
         """Gets the max importance score of the category with the maximum importance score, if not yet recorded.
@@ -515,7 +525,7 @@ class DBConn:
                     WHERE d < ?
                 ) l ON a.article_id = l.article_id
                 """
-        cursor.execute(query, (lat, lat, self.search_radius))
+        cursor.execute(query, (lat, long, self.search_radius))
         article_list = cursor.fetchall()
         db.close()
         return article_list

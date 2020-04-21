@@ -273,7 +273,7 @@ class TestDBConn(unittest.TestCase):
         act_category = conn.cursor().execute(query, (category,)).fetchone()
         self.assertIsNone(act_category)
 
-    def test_select_articles_location_positive(self):
+    def test_select_articles_location(self):
         exp_articles = [(1, 'a'), (2, 'b')]
         location = (30.0, 30.0)
         act_articles = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_articles_location(*location)
@@ -281,12 +281,6 @@ class TestDBConn(unittest.TestCase):
         exp_articles = [(3, 'c')]
         location = (-1, 30.0)
         act_articles = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_articles_location(*location)
-        self.assertEqual(exp_articles, act_articles)
-
-    def test_select_articles_location_negative(self):
-        exp_articles = [(3, 'c')]
-        location = (-30.1, 30.1)
-        act_articles = DBConn(TestDBConn.DB_FILENAME).select_articles_location(*location)
         self.assertEqual(exp_articles, act_articles)
 
     def test_select_articles_location_does_not_exist(self):
