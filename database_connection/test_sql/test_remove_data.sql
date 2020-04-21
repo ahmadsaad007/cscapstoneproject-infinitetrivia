@@ -7,3 +7,5 @@ DELETE FROM article_category;
 DELETE FROM category;
 
 DELETE FROM article;
+
+DELETE FROM location;
