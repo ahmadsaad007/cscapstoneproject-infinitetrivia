@@ -38,6 +38,7 @@ class Game:
         self.game_started = False
         self.current_trivia = ""
         self.number_of_responses = 0
+        self.number_of_lies = 0
         self.current_answer = ""
 
     def add_player_to_lobby(self, player: Player) -> bool:
@@ -135,7 +136,27 @@ class Game:
                 return [True, True]
             return [True, False]
 
+    def submit_lie(self, data: dict) -> list:
+        """Retrives a lie submitted by a player in a fibbage game.
+
+        :returns: A list, the first value corresponding to the success
+        of submitting lie, the second corresponding to the if there are more players left to submit lies
+
+        """
+        player = self.get_player_by_sid(data['sid'])
+        if player is None:
+            return [False, False]
+        player.current_lie = data['lie']
+        print("submitted lie:", data['lie'])
+        self.number_of_lies += 1
+        print("number of lies:", self.number_of_lies)
+        print('number of players:', self.num_players)
+        if self.number_of_lies == self.num_players:
+            return [True, True]
+        return [True, False]
+
     def get_trivia_answer_and_responses(self) -> dict:
+
         """Returns the answer to the current trivia, and the responses of each player
 
         :returns: a dictionary containing the trivia answer, and player answers
@@ -154,6 +175,61 @@ class Game:
         self.update_scores(data)
         self.number_of_responses = 0
         return data
+
+    def get_fibbage_answer_and_responses(self) -> dict:
+        """Returns the answer to the current trivia, and the lies+answers of each player
+
+        :returns: a dictionary containing the trivia answer, and the lie and answer of each player
+        """
+        data = dict()
+        data['answer'] = self.current_answer
+        data['players'] = []
+        for player in self.players:
+            player_info = dict()
+            player_info['name'] = player.name
+            player_info['answer'] = player.current_answer
+            is_correct = (player.current_answer == self.current_answer)
+            player_info['correct'] = is_correct
+            player_info['lie'] = player.current_lie
+            num_fooled = len([p.current_answer
+                              for p in self.players
+                              if p.current_answer == player.current_lie])
+            player_info['fooled'] = num_fooled
+            player.number_fooled = num_fooled
+            data['players'].append(player_info)
+        self.round_number += 1
+        # self.update_fibbage_scores(data) TODO
+        self.number_of_responses = 0
+        self.update_fibbage_scores(data)
+        return data
+
+    def get_fibbage_lies_and_answer(self) -> dict:
+        """Returns all user-submitted lies to current fibbage trivia, and real answer 
+
+        :returns: a dictionary containing the trivia answer, and player's lies
+        """
+        data = dict()
+        data['answer'] = self.current_answer
+        data['lies'] = []
+        for player in self.players:
+            lie = player.current_lie
+            if lie != "":
+                data['lies'].append(lie)
+                #  player.current_lie = ""
+                #  self.numer_of_lies = 0
+        return data
+
+    def update_fibbage_scores(self, data):
+        """Updates the scores of each player based on the answer and lies of each player"""
+        for player in self.players:
+            if data['answer'] == player.current_answer:
+                player.update_score(1)
+            player.update_score(player.number_fooled)
+            player.number_fooled = 0
+            player.current_lie = ""
+            player.current_answer = ""
+        self.number_of_lies = 0
+
 
     def update_scores(self, data):
         """Updates the scores of each player based on the data of each player."""

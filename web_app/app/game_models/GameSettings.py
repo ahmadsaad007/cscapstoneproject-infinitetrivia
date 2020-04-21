@@ -3,10 +3,7 @@ Game Settings
 =============
 """
 
-from dataclasses import dataclass
 
-
-@dataclass
 class GameSettings:
     """Class which holds the settings of a current game instance.
     
@@ -16,9 +13,10 @@ class GameSettings:
     :param number_of_rounds: the number of rounds to be played for a given game.
     :param response_timer: how long players have, in seconds, to answer a question before timing out.
     """
-
-    topic: str
-    game_mode: str
-    max_players: int
-    number_of_rounds: int
-    response_timer: int
+    def __init__(self, game_mode, topic=None, max_players=10,
+                 number_of_rounds=10, response_timer=30):
+        self.game_mode = game_mode
+        self.topic = topic
+        self.max_players = max_players
+        self.number_of_rounds = number_of_rounds
+        self.response_timer = response_timer
