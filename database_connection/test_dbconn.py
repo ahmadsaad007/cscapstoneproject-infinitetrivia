@@ -207,16 +207,16 @@ class TestDBConn(unittest.TestCase):
         self.assertEqual(exp_t_unit, act_t_unit)
 
     def test_select_tunit_random(self):
-        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30, 30, 0, 0, 0),
-                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.25, 30.25, 1, 1, 1),
-                           TUnit('sentence_c', 3, 'url', 1234, 3, -30, 30, 2, 2, 2),
-                           TUnit('sentence_d', 4, 'url', 1234, 4, 10, 10, 3, 3, 3)]
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30.0, 30.0, 0, 0, 0),
+                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1),
+                           TUnit('sentence_c', 3, 'url', 1234, 3, -1.0, 30.0, 2, 2, 2),
+                           TUnit('sentence_d', 4, 'url', 1234, 4, -1.0, 30.25, 3, 3, 3)]
         act_t_unit = DBConn(TestDBConn.DB_FILENAME).select_tunit_random()
         self.assertIn(act_t_unit, exp_t_unit_list)
 
     def test_select_tunit_category_exists(self):
-        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30, 30, 0, 0, 0),
-                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.25, 30.25, 1, 1, 1)]
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30.0, 30.0, 0, 0, 0),
+                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1)]
         act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('category_a')
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 

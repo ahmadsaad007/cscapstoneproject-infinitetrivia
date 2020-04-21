@@ -60,13 +60,6 @@ class DBConn:
         c = 2 * asin(sqrt(a))
         r = 3956
         return c * r
-        # return 3960 * acos(
-        #     cos(radians(query_lat)) *
-        #     cos(radians(lat)) *
-        #     cos(radians(long) - radians(query_long)) +
-        #     sin(radians(query_lat)) *
-        #     sin(radians(lat))
-        # )
 
     def select_max_importance(self) -> float:
         """Gets the max importance score of the category with the maximum importance score, if not yet recorded.
@@ -425,11 +418,6 @@ class DBConn:
         db = connect(self.db_filename)
         db.create_function('DISTANCE', 4, DBConn._distance)
         cursor = db.cursor()
-        # query = '''
-        #         SELECT t_unit_Id, DISTANCE(lat, long, ?, ?) d
-        #         FROM t_unit
-        #         WHERE d < 100
-        #         '''
         query = '''
                 SELECT sentence, article_id, url, access_timestamp, tu.t_unit_Id, lat, long, num_likes, num_mehs,
                     num_dislikes
