@@ -27,8 +27,11 @@ VALUES (1, 'Jill', 'jill@email.com', 'pass1', 5, 5, 10, 5),
        (2, 'Jack', 'jack@email.com', 'pass2', 7, 7, 14, 7);
 
 INSERT INTO t_unit
-VALUES (1, 1, 'sentence_a', 'url', 1234, 30.0, 30.0, 0, 0, 0),
+VALUES (1, 1, 'sentence_a', 'url', 1234, 18.1, -66.7, 0, 0, 0),
        (2, 2, 'sentence_b', 'url', 1234, 30.0, 30.25, 1, 1, 1),
        (3, 3, 'sentence_c', 'url', 1234, -1.0, 30.0, 2, 2, 2),
        (4, 4, 'sentence_d', 'url', 1234, -1.0, 30.25, 3, 3, 3);
+
+INSERT INTO location (zip, lat, long)
+VALUES ('00601', 18.180555, -66.749961)
 
