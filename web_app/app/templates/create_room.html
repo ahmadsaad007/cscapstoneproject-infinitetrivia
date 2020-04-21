@@ -20,6 +20,19 @@
         <div id="radio_buttons">
 
           <!-- Options -->
+          <div class="dropdown">
+            <label for="location">
+             
+              <input type="radio" value="random"  name="game_mode" id="location" checked> <span>Location</span>
+                <div class="dropdown-content">
+                  <form class="form-wrapper">
+                    <input type="text" id="answer" placeholder="Type zipcode here" required>
+                    <input type="submit" id="submit">
+                </form>
+    
+              </div>
+          </label>
+              </div>
           <label for="fibbage">
             <input type="radio" value="fibbage" name="game_mode" id="fibbage"> <span>Fibbage</span>
           </label>
@@ -29,6 +42,9 @@
           <label for="random">
        <input type="radio" value="random"  name="game_mode" id="random" checked> <span>Random</span>
         </label>
+      
+          
+
         </div>
 	<button class="room" id="create_room_button">Create Room!</button>
       </div>
