@@ -217,7 +217,12 @@ class TestDBConn(unittest.TestCase):
     def test_select_tunit_category_exists(self):
         exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 18.1, -66.7, 0, 0, 0),
                            TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1)]
-        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('category_a')
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('y_a')
+        self.assertEqual(exp_t_unit_list, act_t_unit_list)
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 18.1, -66.7, 0, 0, 0),
+                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1),
+                           TUnit('sentence_c', 3, 'url', 1234, 3, -1.0, 30.0, 2, 2, 2)]
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('category')
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_select_tunit_category_does_not_exist(self):

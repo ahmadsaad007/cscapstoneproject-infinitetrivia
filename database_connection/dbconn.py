@@ -407,14 +407,14 @@ class DBConn:
         db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
-                SELECT  sentence, tu.article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
+                SELECT DISTINCT sentence, tu.article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
                     num_dislikes
                 FROM t_unit tu
                 JOIN article_category ac on tu.article_id = ac.article_id
                 JOIN category c on ac.category_id = c.category_id
-                WHERE c.name = ?
+                WHERE c.name LIKE ?
                 """
-        cursor.execute(query, (category,))
+        cursor.execute(query, ('%' + category + '%',))
         t_unit_list = [TUnit(*t_unit_tuple) for t_unit_tuple in cursor.fetchall()]
         db.close()
         return t_unit_list
