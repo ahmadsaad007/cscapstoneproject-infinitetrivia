@@ -1,5 +1,10 @@
-from cscapstoneproject-infinitetrivia.nlp_helpers import features
-from cscapstoneproject-infinitetrivia.trivia_ranker import feature_engineering
+# Handle import junk
+top_level_dir = os.path.abspath('../')
+# include trivia generator modules
+sys.path.append(top_level_dir)
+
+from nlp_helpers import features
+from trivia_ranker import feature_engineering
 import pickle
 
 def generate_labels(sentence_list):
