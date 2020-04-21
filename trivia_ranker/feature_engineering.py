@@ -1,10 +1,11 @@
+import os
+import sys
 # Handle import junk
 top_level_dir = os.path.abspath('../')
 # include trivia generator modules
 sys.path.append(top_level_dir)
 
 import itertools
-import spacy
 import csv
 import random
 import pandas as pd
@@ -15,6 +16,7 @@ from nlp_helpers import ContradictatoryMatcher
 from trivia_generator.web_scraper import WebScraper
 from trivia_generator import NLPPreProcessor
 from trivia_generator import TUnit
+import spacy
 
 nlp = NLPConn.get_nlp_conn()
 
@@ -58,7 +60,10 @@ def generate_training_data():
     tunits = NLPPreProcessor.get_TUnits(article)
     TUnit.tunit_list_to_tsv(tunits)
     
-    corpus_data = read_csv("tunits.tsv")
+    cur_path = os.path.dirname(__file__)
+    new_path = os.path.relpath('..\\trivia_generator\\tunits.tsv', cur_path)
+    
+    corpus_data = read_csv(new_path)
     sentence_list=[]
     for line in corpus_data:
         sentence_list.append(line[0].lower())
