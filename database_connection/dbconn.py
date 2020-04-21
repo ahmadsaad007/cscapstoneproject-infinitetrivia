@@ -13,6 +13,7 @@ from configparser import ConfigParser
 from trivia_generator import TUnit
 from flask_login import UserMixin
 from trivia_generator.TUnit import TUnit
+from trivia_generator.web_scraper import Article
 
 
 @dataclass
@@ -184,13 +185,13 @@ class DBConn:
         db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
-                SELECT article.article_id, article.title
-                FROM article_category
-                    JOIN category ON article_category.category_id = category.category_id
-                    JOIN article ON article_category.article_id = article.article_id
-                WHERE name = ?;
+                SELECT DISTINCT a.article_id, a.title
+                FROM article_category ac
+                    JOIN category c ON ac.category_id = c.category_id
+                    JOIN article  a ON ac.article_id = a.article_id
+                WHERE c.name LIKE ?;
                 """
-        cursor.execute(query, (category,))
+        cursor.execute(query, ('%' + category + '%',))
         rows = cursor.fetchall()
         db.close()
         return rows

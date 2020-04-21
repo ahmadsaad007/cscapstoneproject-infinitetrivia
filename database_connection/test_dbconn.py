@@ -78,10 +78,13 @@ class TestDBConn(unittest.TestCase):
         self.assertEqual(exp_categories, act_categories)
 
     def test_select_category_articles(self):
-        category = 'category_b'
         exp_articles = [(1, 'a'), (3, 'c')]
-        act_articles = DBConn(TestDBConn.DB_FILENAME).select_category_articles(category)
+        act_articles = DBConn(TestDBConn.DB_FILENAME).select_category_articles('y_b')
         self.assertEqual(exp_articles, act_articles)
+        exp_articles = [(1, 'a'), (2, 'b'), (3, 'c')]
+        act_articles = DBConn(TestDBConn.DB_FILENAME).select_category_articles('tegor')
+        self.assertEqual(exp_articles, act_articles)
+
 
     def test_insert_user(self):
         exp_user = DBUser(username='Jim', email='jim@email.com')
