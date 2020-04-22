@@ -3,14 +3,16 @@ Database Connection
 ===================
 """
 from dataclasses import dataclass
-import random
-import sqlite3
-import os
+from math import cos, sin, asin, radians, sqrt
+from random import random
+from sqlite3 import connect
+from os import path
+from typing import Optional
+from configparser import ConfigParser
 
 from trivia_generator import TUnit
 from flask_login import UserMixin
 from trivia_generator.TUnit import TUnit
-from typing import Optional
 
 
 @dataclass
@@ -33,24 +35,37 @@ class DBConn:
     Class representing a database connection.
     """
 
-    DB_CONFIG_FILE: str = "db.cfg"
+    DB_CONFIG_FILE: str = "db.ini"
     db_filename: str = None
     max_importance: float = None
+    search_radius: float = None
 
-    def __init__(self, filename=None):
-        if filename is None:
-            local_path = os.path.dirname(os.path.abspath(__file__))
-            config_filepath = os.path.join(local_path, DBConn.DB_CONFIG_FILE)
-            with open(config_filepath, "r") as file:
-                self.db_filename = os.path.join(local_path, file.read().split("=")[1])
-        else:
-            self.db_filename = filename
+    def __init__(self, filename=None, search_radius=None):
+        local_path = path.dirname(path.abspath(__file__))
+        config_filepath = path.join(local_path, DBConn.DB_CONFIG_FILE)
+        config = ConfigParser()
+        config.read(config_filepath)
+        self.db_filename = config['DATABASE']['DatabaseFile'] if filename is None else filename
+        self.search_radius = float(config['DATABASE']['SearchRadius']) if search_radius is None else search_radius
+
+    @staticmethod
+    def _distance(lat: float, long: float, query_lat: float, query_long: float):
+        lat = radians(lat)
+        long = radians(long)
+        query_lat = radians(query_lat)
+        query_long = radians(query_long)
+        d_lon = query_long - long
+        d_lat = query_lat - lat
+        a = sin(d_lat / 2)**2 + cos(lat) * cos(query_lat) * sin(d_lon / 2)**2
+        c = 2 * asin(sqrt(a))
+        r = 3956
+        return c * r
 
     def select_max_importance(self) -> float:
         """Gets the max importance score of the category with the maximum importance score, if not yet recorded.
         """
         if self.max_importance is None:
-            db = sqlite3.connect(self.db_filename)
+            db = connect(self.db_filename)
             cursor = db.cursor()
             cursor.execute('SELECT MAX(importance) FROM category;')
             row = cursor.fetchone()
@@ -64,7 +79,7 @@ class DBConn:
         returns: the article id and title of the random article.
         rtype: (int, str)
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         cursor.execute('SELECT article_id, title FROM article ORDER BY random() LIMIT 1;')
         article_id, title = cursor.fetchone()
@@ -77,10 +92,10 @@ class DBConn:
         returns: the article id and title of the random article.
         rtype: (int, str)
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
 
-        min_select_importance = random.random() * self.select_max_importance()
+        min_select_importance = random() * self.select_max_importance()
 
         query = """
                 SELECT article.article_id, article.title, SUM(importance) AS article_importance
@@ -104,9 +119,9 @@ class DBConn:
         returns: the category id, name, and importance of the category.
         """
 
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
-        min_select_importance = random.random() * self.select_max_importance()
+        min_select_importance = random() * self.select_max_importance()
 
         # Get a random category whose importace score is above min_select_importance
         query = """
@@ -125,11 +140,11 @@ class DBConn:
 
         :param article_id: The ID of the article.
         :type article_id: int
-        :raises: sqlite3.DatabaseError
+        :raises: DatabaseError
         :returns: the list of strings representing the names of the categories.
         :rtype: [str]
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 SELECT name
@@ -147,11 +162,11 @@ class DBConn:
 
         :param category: category name.
         :type category: int
-        :raises: sqlite3.DatabaseError
+        :raises: DatabaseError
         :returns: the list of article_ids associated with that category.
         :rtype: [(int, str)]
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 SELECT article.article_id, article.title
@@ -173,11 +188,11 @@ class DBConn:
         :type user: DBUser
         :param password: the user's password
         :type password: str
-        :raises: sqlite3.DatabaseError
+        :raises: DatabaseError
         :return: database user_id
         :rtype: int
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
         INSERT INTO user (username, email, password, wins, losses, num_answered, num_answered_correct)
@@ -201,11 +216,11 @@ class DBConn:
 
         :param user: the DBUser object to be added to the database
         :type user: DBUser
-        :raises: sqlite3.DatabaseError
+        :raises: DatabaseError
         :return: database user_id or -1 if user not found
         :rtype: int
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 UPDATE user
@@ -243,7 +258,7 @@ class DBConn:
         :raises: sqlite3.DatabaseError
         :return: password entry
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         query = '''
         SELECT password
         FROM user
@@ -260,11 +275,11 @@ class DBConn:
         :type username: str
         :param password: new password
         :type password: str
-        :raises: sqlite3.DatabaseError
+        :raises: DatabaseError
         :return: database user_id or -1 if user not found
         :rtype: int
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 UPDATE user
@@ -285,11 +300,11 @@ class DBConn:
 
         :param username: username to be retrieved
         :type username: str
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         :returns: an object representing a player or None
         :rtype: DBUser or None
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 SELECT user_id, username, email, wins, losses, num_answered, num_answered_correct
@@ -309,9 +324,9 @@ class DBConn:
 
         :param user: a users's object to be deleted from database
         :type user: DBUser
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 DELETE FROM user
@@ -326,11 +341,11 @@ class DBConn:
 
         :param t_unit: a TUnit object to be deleted from database
         :type t_unit: TUnit
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         :returns: t_unit_Id or -1 of not found
         :rtype: int
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 REPLACE INTO t_unit (t_unit_Id, sentence, article_id, url, access_timestamp, lat, long, num_likes,
@@ -348,11 +363,11 @@ class DBConn:
     def select_tunit_random(self) -> TUnit:
         """Gets a TUnit from the database by random.
 
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         :returns: an object representing a TUnit
         :rtype: TUnit
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 SELECT sentence, article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
@@ -370,11 +385,11 @@ class DBConn:
 
         :param category: the category used to to find TUnits
         :type category: str
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         :returns: a list of TUnit objects
         :rtype: [TUnit] or empty list if category not found
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 SELECT  sentence, tu.article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
@@ -396,21 +411,24 @@ class DBConn:
         :type lat: float
         :param long: a longitudinal coordinate
         :type long: float
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         :returns: a list of TUNit objects
         :rtype: [TUnit] or empty list if not found
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
+        db.create_function('DISTANCE', 4, DBConn._distance)
         cursor = db.cursor()
-        query = """
-                SELECT sentence, article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
+        query = '''
+                SELECT sentence, article_id, url, access_timestamp, tu.t_unit_Id, lat, long, num_likes, num_mehs,
                     num_dislikes
-                FROM t_unit
-                WHERE lat > ? - 0.5 AND lat < ? + 0.5
-                AND 
-                long > ? - 0.5 AND long < ? + 0.5
-                """
-        cursor.execute(query, (lat, lat, long, long))
+                FROM t_unit tu
+                JOIN (
+                    SELECT t_unit_Id, DISTANCE(lat, long, ?, ?) d
+                    FROM t_unit
+                    WHERE d < ?
+                ) l ON tu.t_unit_Id = l.t_unit_Id
+                '''
+        cursor.execute(query, (lat, long, self.search_radius))
         t_unit_list = [TUnit(*t_unit_tuple) for t_unit_tuple in cursor.fetchall()]
         db.close()
         return t_unit_list
@@ -420,9 +438,9 @@ class DBConn:
 
         :param t_unit: a TUnit object to be deleted from database
         :type t_unit: TUnit
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 DELETE FROM t_unit
@@ -439,11 +457,11 @@ class DBConn:
         :type category: str
         :param importance: relevance of category
         :type importance: float
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         :returns: the category id
         :rtype: int
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 INSERT INTO category (name, importance) 
@@ -460,9 +478,9 @@ class DBConn:
 
         :param category: the category to be deleted from the database
         :type category: str
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
                 DELETE FROM category
@@ -479,20 +497,23 @@ class DBConn:
         :type lat: float
         :param long: the longitudinal coordinate
         :type long: float
-        :raises sqlite3.DatabaseError:
+        :raises DatabaseError:
         :returns: a list of tuples representing an article id and title
         :rtype: [(int, str)]
         """
-        db = sqlite3.connect(self.db_filename)
+        db = connect(self.db_filename)
+        db.create_function('DISTANCE', 4, DBConn._distance)
         cursor = db.cursor()
         query = """
-                SELECT a.article_id, title
+                SELECT a.article_id, a.title
                 FROM article a
-                JOIN t_unit tu on a.article_id = tu.article_id
-                WHERE tu.lat > ? - 0.5 AND tu.lat < ? + 0.5 AND
-                tu.long > ? - 0.5 AND tu.long < ? + 0.5
+                JOIN (
+                    SELECT article_id, DISTANCE(lat, long, ?, ?) d
+                    FROM t_unit
+                    WHERE d < ?
+                ) l ON a.article_id = l.article_id
                 """
-        cursor.execute(query, (lat, lat, long, long))
+        cursor.execute(query, (lat, long, self.search_radius))
         article_list = cursor.fetchall()
         db.close()
         return article_list
