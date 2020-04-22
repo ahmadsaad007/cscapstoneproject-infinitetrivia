@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/question_page.css') }}">
   <link rel="stylesheet" href="question_page.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
   
@@ -24,10 +25,9 @@
             <label for="location">
              
               <input type="radio" value="location"  name="game_mode" id="location" checked> <span>Location</span>
-                <div class="dropdown-content">
-                  <form class="form-wrapper">
-                    <input type="text" id="answer" placeholder="Type zipcode here" required>
-                    <input type="submit" id="submit">
+                <div class="dropdown-location">
+                  <form method="post">
+                    <input type="text" name="u" placeholder="Zip Code" required="required" />
                 </form>
     
               </div>
@@ -36,16 +36,25 @@
           <label for="fibbage">
             <input type="radio" value="fibbage" name="game_mode" id="fibbage"> <span>Fibbage</span>
           </label>
+          <div class="dropdown">
           <label for="category">
           <input type="radio" value="category" name="game_mode" id="category"> <span>Category</span>
+          
+          <div class="dropdown-category">
+            <form method="post">
+              <input type="text" name="u" placeholder="Category" required="required" />
+          </form>
+
+        
+        </div>
         </label>
+      </div>
           <label for="random">
        <input type="radio" value="random"  name="game_mode" id="random" checked> <span>Random</span>
         </label>
       
           
-
-        </div>
+      </div>
 	<button class="room" id="create_room_button">Create Room!</button>
       </div>
       <!--

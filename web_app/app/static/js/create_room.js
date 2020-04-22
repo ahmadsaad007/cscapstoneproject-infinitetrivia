@@ -278,13 +278,13 @@ function display_fibbage_answer(data){
 	    let player_sublist = '<ul id="' + player['name'] + '_list">' + '</ul>';
 	    $('#' + player['name'] + '_item').append(player_sublist);
 	    let sublist_id = player['name'] + '_list';
-	    $('#' + sublist_id).append('<li>Answer: '
+	    $('#' + sublist_id).append('<li id="sublist">Answer: '
 				       + player['answer']
 				       + ' (+ '
 				       + (player['correct'] ? '1' : '0')
 				       + ')'
       				       + '</li>');
-	    $('#' + sublist_id).append('<li>Lie: '
+	    $('#' + sublist_id).append('<li id="sublist">Lie: '
 				       + player['lie']
 				       + ' (+ '
 				       + player['fooled']
