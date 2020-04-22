@@ -15,7 +15,7 @@ def create_game(game_options):
     # TODO: potentially create game code server side instead of client side?
     code = game_options['code']
     # create game mode object
-    settings = GameSettings(game_options['code'])
+    settings = GameSettings(game_options)
     # create new Game object and add to game dict
     game = Game(code, settings, request.sid)
     games[code] = game

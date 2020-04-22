@@ -31,6 +31,7 @@ def get_page_by_category(category: str) -> Article:
 
     """
     articles_with_category = DBConn().select_category_articles(category)
+    print("articles by category:", articles_with_category)
     if not articles_with_category:
         return None
 
@@ -85,6 +86,30 @@ def get_page_by_location(latitude: float, longitude: float, radius: int) -> Arti
 
     article = _get_article_features(page_html, url, access_timestamp)
     return article
+
+
+def get_page_by_location_zip(zip_code: str):
+    """Gets the contents and metadata of a a Wikipedia article close to the given zip code.
+
+    :param zip_code: the zipcode of the desired location, as a string
+    :returns: the Article object representing the Wikipedia article
+    """
+    article_id, title = None, None
+    page_html = None
+    url = None
+    while page_html is None:
+        article_list = DBConn().select_articles_location(zip_code)
+        print("location article list: ", article_list)
+        if article_list is None or len(article_list) == 0:
+            print("didn't find anything at zip", zip_code)
+            return None
+        article_id, title = random.choice(article_list)
+        url = BASE_URL + title.replace(' ', '_')
+        page_html = _get_page_from_title(title)
+    access_timestamp = int(time.time())
+    article = _get_article_features(page_html, url, access_timestamp, article_id)
+    return article
+
 
 def _get_nearby_articles(latitude: float, longitude: float, radius: int) -> list:
     """Gets a list of Wikipedia articles that are located close to the given coordinates:
