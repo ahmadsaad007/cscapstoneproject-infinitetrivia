@@ -85,7 +85,6 @@ class TestDBConn(unittest.TestCase):
         act_articles = DBConn(TestDBConn.DB_FILENAME).select_category_articles('tegor')
         self.assertEqual(exp_articles, act_articles)
 
-
     def test_insert_user(self):
         exp_user = DBUser(username='Jim', email='jim@email.com')
         exp_password = 'pass'

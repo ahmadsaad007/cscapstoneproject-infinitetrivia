@@ -46,7 +46,7 @@ class DBConn:
         config_filepath = path.join(local_path, DBConn.DB_CONFIG_FILE)
         config = ConfigParser()
         config.read(config_filepath)
-        self.db_filename = config['DATABASE']['DatabaseFile'] if filename is None else filename
+        self.db_filename = local_path + '\\' + (config['DATABASE']['DatabaseFile'] if filename is None else filename)
         self.search_radius = float(config['DATABASE']['SearchRadius']) if search_radius is None else search_radius
 
     @staticmethod
