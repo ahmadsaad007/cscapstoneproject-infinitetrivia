@@ -59,7 +59,17 @@ function get_game_options(){
             break;
         }
     }
+    console.log("Gamemode: ", mode);
     game_opts.mode = mode;
+    if (mode == "category"){
+	let category = $('#category_text').val();
+	console.log("Chosen category: ", category);
+	game_opts.category = category;
+    } else if (mode == "location"){
+	let zip = $('#zip_code_text').val();
+	console.log("ZIP: ", zip);
+	game_opts.zip_code = zip;
+    }
     GAMEMODE = mode;
 
     return game_opts;

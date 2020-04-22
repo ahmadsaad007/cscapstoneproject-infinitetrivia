@@ -7,6 +7,8 @@ import random
 from .Player import Player
 from .GameSettings import GameSettings
 from trivia_generator.web_scraper.WebScraper import get_page_by_random
+from trivia_generator.web_scraper.WebScraper import get_page_by_category
+from trivia_generator.web_scraper.WebScraper import get_page_by_location_zip
 from trivia_generator.NLPPreProcessor import create_TUnits
 from question_generator.NLPQuestionGeneratorSpacy import nlp_question_generation
 
@@ -104,7 +106,15 @@ class Game:
         """
         quest_ans_pairs = []
         while not quest_ans_pairs:
-            trivia_article = get_page_by_random()
+            if self.game_settings.game_mode == 'category':
+                print("getting article by category")
+                trivia_article = get_page_by_category(self.game_settings.category)
+            elif self.game_settings.game_mode == 'location':
+                print("getting article by category")
+                trivia_article = get_page_by_location_zip(self.game_settings.zip_code)
+            else:
+                print("getting article by random")
+                trivia_article = get_page_by_random()
             tunit_list = create_TUnits(trivia_article)
             if len(tunit_list) > 0:
                 tunit = random.choice(tunit_list)
