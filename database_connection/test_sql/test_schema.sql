@@ -41,3 +41,10 @@ CREATE TABLE "t_unit" (
 	`num_dislikes`	INTEGER,
 	FOREIGN KEY(`article_id`) REFERENCES `article`(`article_id`) ON DELETE SET NULL
 );
+
+CREATE TABLE "location" (
+	"location_id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"zip"	TEXT NOT NULL,
+	"lat"	INTEGER NOT NULL,
+	"long"	INTEGER NOT NULL
+);

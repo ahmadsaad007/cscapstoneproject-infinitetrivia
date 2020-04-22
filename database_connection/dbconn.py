@@ -13,6 +13,7 @@ from configparser import ConfigParser
 from trivia_generator import TUnit
 from flask_login import UserMixin
 from trivia_generator.TUnit import TUnit
+from trivia_generator.web_scraper import Article
 
 
 @dataclass
@@ -50,16 +51,31 @@ class DBConn:
 
     @staticmethod
     def _distance(lat: float, long: float, query_lat: float, query_long: float):
+        if query_lat is None or query_long is None:
+            return -1
         lat = radians(lat)
         long = radians(long)
         query_lat = radians(query_lat)
         query_long = radians(query_long)
         d_lon = query_long - long
         d_lat = query_lat - lat
-        a = sin(d_lat / 2)**2 + cos(lat) * cos(query_lat) * sin(d_lon / 2)**2
+        a = sin(d_lat / 2) ** 2 + cos(lat) * cos(query_lat) * sin(d_lon / 2) ** 2
         c = 2 * asin(sqrt(a))
         r = 3956
         return c * r
+
+    def _select_lat_long(self, zip_code: str) -> tuple:
+        db = connect(self.db_filename)
+        cursor = db.cursor()
+        query = """
+                SELECT lat, long
+                FROM location
+                WHERE zip = ?
+                """
+        cursor.execute(query, (zip_code,))
+        lat_long = cursor.fetchone()
+        db.close()
+        return lat_long if lat_long is not None else (None, None)
 
     def select_max_importance(self) -> float:
         """Gets the max importance score of the category with the maximum importance score, if not yet recorded.
@@ -169,13 +185,13 @@ class DBConn:
         db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
-                SELECT article.article_id, article.title
-                FROM article_category
-                    JOIN category ON article_category.category_id = category.category_id
-                    JOIN article ON article_category.article_id = article.article_id
-                WHERE name = ?;
+                SELECT DISTINCT a.article_id, a.title
+                FROM article_category ac
+                    JOIN category c ON ac.category_id = c.category_id
+                    JOIN article  a ON ac.article_id = a.article_id
+                WHERE c.name LIKE ?;
                 """
-        cursor.execute(query, (category,))
+        cursor.execute(query, ('%' + category + '%',))
         rows = cursor.fetchall()
         db.close()
         return rows
@@ -392,29 +408,26 @@ class DBConn:
         db = connect(self.db_filename)
         cursor = db.cursor()
         query = """
-                SELECT  sentence, tu.article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
+                SELECT DISTINCT sentence, tu.article_id, url, access_timestamp, t_unit_Id, lat, long, num_likes, num_mehs,
                     num_dislikes
                 FROM t_unit tu
                 JOIN article_category ac on tu.article_id = ac.article_id
                 JOIN category c on ac.category_id = c.category_id
-                WHERE c.name = ?
+                WHERE c.name LIKE ?
                 """
-        cursor.execute(query, (category,))
+        cursor.execute(query, ('%' + category + '%',))
         t_unit_list = [TUnit(*t_unit_tuple) for t_unit_tuple in cursor.fetchall()]
         db.close()
         return t_unit_list
 
-    def select_tunit_location(self, lat: float, long: float) -> list:
+    def select_tunit_location(self, zip_code: str) -> list:
         """Gets a list of TUnits from the database by location.
 
-        :param lat: a latitude coordinate
-        :type lat: float
-        :param long: a longitudinal coordinate
-        :type long: float
         :raises DatabaseError:
         :returns: a list of TUNit objects
         :rtype: [TUnit] or empty list if not found
         """
+        lat, long = self._select_lat_long(zip_code)
         db = connect(self.db_filename)
         db.create_function('DISTANCE', 4, DBConn._distance)
         cursor = db.cursor()
@@ -425,7 +438,7 @@ class DBConn:
                 JOIN (
                     SELECT t_unit_Id, DISTANCE(lat, long, ?, ?) d
                     FROM t_unit
-                    WHERE d < ?
+                    WHERE d < ? AND d >= 0
                 ) l ON tu.t_unit_Id = l.t_unit_Id
                 '''
         cursor.execute(query, (lat, long, self.search_radius))
@@ -490,17 +503,15 @@ class DBConn:
         db.commit()
         db.close()
 
-    def select_articles_location(self, lat: float, long: float) -> list:
+    def select_articles_location(self, zip_code: str) -> list:
         """ Retrieves Articles from the database based on a location
 
-        :param lat: the latitude coordinate
-        :type lat: float
-        :param long: the longitudinal coordinate
-        :type long: float
+
         :raises DatabaseError:
         :returns: a list of tuples representing an article id and title
         :rtype: [(int, str)]
         """
+        lat, long = self._select_lat_long(zip_code)
         db = connect(self.db_filename)
         db.create_function('DISTANCE', 4, DBConn._distance)
         cursor = db.cursor()
@@ -510,7 +521,7 @@ class DBConn:
                 JOIN (
                     SELECT article_id, DISTANCE(lat, long, ?, ?) d
                     FROM t_unit
-                    WHERE d < ?
+                    WHERE d < ? AND d >= 0
                 ) l ON a.article_id = l.article_id
                 """
         cursor.execute(query, (lat, long, self.search_radius))

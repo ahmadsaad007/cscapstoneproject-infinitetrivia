@@ -78,10 +78,13 @@ class TestDBConn(unittest.TestCase):
         self.assertEqual(exp_categories, act_categories)
 
     def test_select_category_articles(self):
-        category = 'category_b'
         exp_articles = [(1, 'a'), (3, 'c')]
-        act_articles = DBConn(TestDBConn.DB_FILENAME).select_category_articles(category)
+        act_articles = DBConn(TestDBConn.DB_FILENAME).select_category_articles('y_b')
         self.assertEqual(exp_articles, act_articles)
+        exp_articles = [(1, 'a'), (2, 'b'), (3, 'c')]
+        act_articles = DBConn(TestDBConn.DB_FILENAME).select_category_articles('tegor')
+        self.assertEqual(exp_articles, act_articles)
+
 
     def test_insert_user(self):
         exp_user = DBUser(username='Jim', email='jim@email.com')
@@ -207,7 +210,7 @@ class TestDBConn(unittest.TestCase):
         self.assertEqual(exp_t_unit, act_t_unit)
 
     def test_select_tunit_random(self):
-        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30.0, 30.0, 0, 0, 0),
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 18.1, -66.7, 0, 0, 0),
                            TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1),
                            TUnit('sentence_c', 3, 'url', 1234, 3, -1.0, 30.0, 2, 2, 2),
                            TUnit('sentence_d', 4, 'url', 1234, 4, -1.0, 30.25, 3, 3, 3)]
@@ -215,9 +218,14 @@ class TestDBConn(unittest.TestCase):
         self.assertIn(act_t_unit, exp_t_unit_list)
 
     def test_select_tunit_category_exists(self):
-        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30.0, 30.0, 0, 0, 0),
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 18.1, -66.7, 0, 0, 0),
                            TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1)]
-        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('category_a')
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('y_a')
+        self.assertEqual(exp_t_unit_list, act_t_unit_list)
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 18.1, -66.7, 0, 0, 0),
+                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1),
+                           TUnit('sentence_c', 3, 'url', 1234, 3, -1.0, 30.0, 2, 2, 2)]
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME).select_tunit_category('category')
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_select_tunit_category_does_not_exist(self):
@@ -226,17 +234,13 @@ class TestDBConn(unittest.TestCase):
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_select_tunit_location_exists(self):
-        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 30.0, 30.0, 0, 0, 0),
-                           TUnit('sentence_b', 2, 'url', 1234, 2, 30.0, 30.25, 1, 1, 1)]
-        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location(30.0, 30.0)
-        self.assertEqual(exp_t_unit_list, act_t_unit_list)
-        exp_t_unit_list = [TUnit('sentence_c', 3, 'url', 1234, 3, -1, 30.0, 2, 2, 2)]
-        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location(-1.0, 30.0)
+        exp_t_unit_list = [TUnit('sentence_a', 1, 'url', 1234, 1, 18.1, -66.7, 0, 0, 0)]
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location('00601')
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_select_tunit_location_does_not_exist(self):
         exp_t_unit_list = []
-        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location(10, 10)
+        act_t_unit_list = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_tunit_location('75163')
         self.assertEqual(exp_t_unit_list, act_t_unit_list)
 
     def test_delete_tunit(self):
@@ -253,7 +257,7 @@ class TestDBConn(unittest.TestCase):
 
     def test_insert_category(self):
         exp_category = ('category', 1.5)
-        category_id = DBConn(TestDBConn.DB_FILENAME).insert_category(*exp_category)
+        DBConn(TestDBConn.DB_FILENAME).insert_category(*exp_category)
         query = '''
         SELECT name, importance
         FROM category
@@ -274,19 +278,13 @@ class TestDBConn(unittest.TestCase):
         self.assertIsNone(act_category)
 
     def test_select_articles_location(self):
-        exp_articles = [(1, 'a'), (2, 'b')]
-        location = (30.0, 30.0)
-        act_articles = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_articles_location(*location)
-        self.assertEqual(exp_articles, act_articles)
-        exp_articles = [(3, 'c')]
-        location = (-1, 30.0)
-        act_articles = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_articles_location(*location)
+        exp_articles = [(1, 'a')]
+        act_articles = DBConn(TestDBConn.DB_FILENAME, TestDBConn.SEARCH_RADIUS).select_articles_location('00601')
         self.assertEqual(exp_articles, act_articles)
 
     def test_select_articles_location_does_not_exist(self):
         exp_articles = []
-        location = (0, 0)
-        act_articles = DBConn(TestDBConn.DB_FILENAME).select_articles_location(*location)
+        act_articles = DBConn(TestDBConn.DB_FILENAME).select_articles_location('25974')
         self.assertEqual(exp_articles, act_articles)
 
 
