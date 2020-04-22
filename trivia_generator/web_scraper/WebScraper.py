@@ -31,6 +31,7 @@ def get_page_by_category(category: str) -> Article:
 
     """
     articles_with_category = DBConn().select_category_articles(category)
+    print("articles by category:", articles_with_category)
     if not articles_with_category:
         return None
 
@@ -98,7 +99,9 @@ def get_page_by_location_zip(zip_code: str):
     url = None
     while page_html is None:
         article_list = DBConn().select_articles_location(zip_code)
-        if article_list is None:
+        print("location article list: ", article_list)
+        if article_list is None or len(article_list) == 0:
+            print("didn't find anything at zip", zip_code)
             return None
         article_id, title = random.choice(article_list)
         url = BASE_URL + title.replace(' ', '_')

@@ -110,7 +110,7 @@ class Game:
                 print("getting article by category")
                 trivia_article = get_page_by_category(self.game_settings.category)
             elif self.game_settings.game_mode == 'location':
-                print("getting article by category")
+                print("getting article by location")
                 trivia_article = get_page_by_location_zip(self.game_settings.zip_code)
             else:
                 print("getting article by random")
