@@ -11,7 +11,7 @@ $(function() {
 });
 
 $(function new_registration() {
-	$(".btn-signup").click(function() {
+	$(".submit").click(function() {
     //history.replaceState(null, "", "/signup");
     $(".nav").toggleClass("nav-up");
     $(".form-signup-left").toggleClass("form-signup-down");
@@ -21,7 +21,7 @@ $(function new_registration() {
 });
 
 $(function() {
-	$(".btn-signin").click(function() {
+	$(".submit").click(function() {
     $(".btn-animate").toggleClass("btn-animate-grow");
     $(".welcome").toggleClass("welcome-left");
     $(".cover-photo").toggleClass("cover-photo-down");
