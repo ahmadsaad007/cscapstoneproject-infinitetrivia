@@ -17,7 +17,9 @@ CREATE TABLE "category" (
 
 CREATE TABLE `article` (
 	`article_id`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`title`	TEXT NOT NULL
+	`title`	TEXT NOT NULL,
+	'lat' REAL,
+	'long' REAL
 );
 
 CREATE TABLE "article_category" (

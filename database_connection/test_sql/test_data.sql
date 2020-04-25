@@ -1,14 +1,14 @@
-INSERT INTO article (article_id, title)
-VALUES (1, 'a'),
-       (2, 'b'),
-       (3, 'c'),
-       (4, 'd'),
-       (5, 'e'),
-       (6, 'f'),
-       (7, 'g'),
-       (8, 'h'),
-       (9, 'i'),
-       (10, 'j');
+INSERT INTO article (article_id, title, lat, long)
+VALUES (1, 'a', 18.1, -66.7),
+       (2, 'b', 30.0, 30.25),
+       (3, 'c', -1.0, 30.0),
+       (4, 'd', -1.0, 30.25),
+       (5, 'e', NULL, NULL),
+       (6, 'f', NULL, NULL),
+       (7, 'g', NULL, NULL),
+       (8, 'h', NULL, NULL),
+       (9, 'i', NULL, NULL),
+       (10, 'j', NULL, NULL);
 
 INSERT INTO category (category_id, name, importance)
 VALUES (1, 'category_a', 1),
