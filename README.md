@@ -29,7 +29,7 @@ package depencency, so it may take a while.
 ## Installing Spacy Language Models
 
 After successfully installing the pre-requisite packages, run the
-following to commands to download the spacy english language models:
+following two commands to download the spacy english language models:
 - `python3 -m spacy download en_core_web_lg`
 - `python3 -m spacy download en_core_web_sm`
 
