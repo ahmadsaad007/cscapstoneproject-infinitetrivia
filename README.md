@@ -11,6 +11,7 @@ Infinite Trivia:
 
 1. Ubuntu 19
 2. Windows 10
+3. MacOS Catalina 10.15
 
 ## Program Requirements
 
@@ -49,3 +50,5 @@ If Infinite Trivia has successfully launched, you will get a message
 on the terminal window which displays the IP and port number which it
 is being hosted on (default: `127.0.0.1:5000`). Navigate to the
 displayed webpage on your browser and start playing!
+
+Currently, Infinite Trivia only supports local hosting. This means that the host browser and the player browsers must be on the same machine. They will all navigate to the IP and port number displayed on the terminal window.
