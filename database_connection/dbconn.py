@@ -51,7 +51,7 @@ class DBConn:
 
     @staticmethod
     def _distance(lat: float, long: float, query_lat: float, query_long: float):
-        if lat == -2 or lat is None or lat == -1:
+        if lat is None or long is None:
             return -1
         lat = radians(lat)
         long = radians(long)
