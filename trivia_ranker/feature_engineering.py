@@ -1,5 +1,11 @@
+import os
+import sys
+# Handle import junk
+top_level_dir = os.path.abspath('../')
+# include trivia generator modules
+sys.path.append(top_level_dir)
+
 import itertools
-import spacy
 import csv
 import random
 import pandas as pd
@@ -10,6 +16,7 @@ from nlp_helpers import ContradictatoryMatcher
 from trivia_generator.web_scraper import WebScraper
 from trivia_generator import NLPPreProcessor
 from trivia_generator import TUnit
+import spacy
 
 nlp = NLPConn.get_nlp_conn()
 
@@ -33,8 +40,8 @@ def get_unigram_features(sentences):
     
     df = pd.DataFrame(X.toarray(),columns = vectorizer.get_feature_names())
     
-    df["idf_Sum"] = df.sum(axis=1)
-    idf_Sum = df['idf_Sum'].values.tolist()
+    df["idf_Avg"] = df.sum(axis=1)/len(df.columns)
+    idf_Sum = df['idf_Avg'].values.tolist()
     return idf_Sum
 
 def read_csv(fileName):
@@ -53,7 +60,10 @@ def generate_training_data():
     tunits = NLPPreProcessor.get_TUnits(article)
     TUnit.tunit_list_to_tsv(tunits)
     
-    corpus_data = read_csv("tunits.tsv")
+    cur_path = os.path.dirname(__file__)
+    new_path = os.path.relpath('..\\trivia_generator\\tunits.tsv', cur_path)
+    
+    corpus_data = read_csv(new_path)
     sentence_list=[]
     for line in corpus_data:
         sentence_list.append(line[0].lower())
@@ -83,20 +93,19 @@ def generate_training_data():
             value = 0
         else:
             value = (likes + 0.5*mehs)/total_votes
-        if(value < 0.33):
+        if(value < 0.45):
             label = 0
-        elif(value > 0.67):
+        elif(value > 0.75):
             label = 2
         else:
             label = 1
         like_ratios.append(label)
     
     #write data to csv
-    rows = zip(sentence_list, ner_ratio, uni_features, has_contra, has_super, fog, like_ratios)
-    
-    with open('training_data.csv','w') as file:
+    with open('training_data.csv','w', newline='') as file:
         wr = csv.writer(file, dialect='excel', delimiter=',')
-        for row in rows:
-            wr.writerow(row)
+        for index in range(len(sentence_list)):
+            wr.writerow([sentence_list[index], ner_ratio[index], uni_features[index], has_contra[index], has_super[index], fog[index], like_ratios[index]])
+
 
 generate_training_data()
