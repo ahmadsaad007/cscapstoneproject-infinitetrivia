@@ -51,7 +51,7 @@ class DBConn:
 
     @staticmethod
     def _distance(lat: float, long: float, query_lat: float, query_long: float):
-        if query_lat is None or query_long is None:
+        if lat is None or long is None or query_lat is None or query_long is None:
             return -1
         lat = radians(lat)
         long = radians(long)
@@ -520,7 +520,7 @@ class DBConn:
                 FROM article a
                 JOIN (
                     SELECT article_id, DISTANCE(lat, long, ?, ?) d
-                    FROM t_unit
+                    FROM article
                     WHERE d < ? AND d >= 0
                 ) l ON a.article_id = l.article_id
                 """
