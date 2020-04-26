@@ -51,4 +51,34 @@ on the terminal window which displays the IP and port number which it
 is being hosted on (default: `127.0.0.1:5000`). Navigate to the
 displayed webpage on your browser and start playing!
 
-Currently, Infinite Trivia only supports local hosting. This means that the host browser and the player browsers must be on the same machine. They will all navigate to the IP and port number displayed on the terminal window.
+Currently, Infinite Trivia only supports local hosting. This means 
+that the host browser and the player browsers must be on the same 
+machine. They will all navigate to the IP and port number displayed on
+the terminal window.
+
+# Software Information
+
+## Implemented Features
+
+Infinite Trivia currently support local play only. It supports four
+different game modes. They are:
+- Random (Not for the faint of heart)
+- Category (Pick categorical trivia!)
+- Location (Trivia near your zip code)
+- Fibbage (Players try to make up convincing lies, and get points for
+fooling their friends!)
+
+Infinite Trivia supports multiple simultaneous games
+
+## Known Bugs
+
+- Using enter to submit an answer sends the player back to the home page
+and the user be removed from the game
+- Fibbage mode will not notify a user if they got it correct
+- Fibbage mode allows players to select their own lie
+- There is no validation on category and location
+- Category and location are not exhaustive as the trivia is pulled from
+a database that is not complete
+- Server will hang on certain articles
+- Front end is not consistent
+- Questions still come from quotations
