@@ -1,4 +1,4 @@
-*** Disclaimer *** Forked Repo of the Project: Infinite Trivia. My contribution to this project was the ML and NLP Module. The rest was done by my team members from Senior year Capstone class
+
 
 # Infinite Trivia
 The trivia that keeps on giving!
